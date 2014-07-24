@@ -59,47 +59,38 @@ Given a xml document such as below
 We can do the following
 
 ```elixir
-
 import SweetXml
 doc = "..." # as above
-
 ```
 
 get the name of the first match
 
 ```elixir
-
 result = doc |> xpath(~x"//matchup/name/text()") # `sigil_x` for (x)path
 assert result == 'Match One'
-
 ```
 
 get the xml record of the name of the first match
 
 ```elixir
-
 result = doc |> xpath(~x"//matchup/name"e) # `e` is the modifier for (e)ntity
 assert result == {:xmlElement, :name, :name, [], {:xmlNamespace, [], []},
         [matchup: 2, matchups: 2, game: 1], 2, [],
         [{:xmlText, [name: 2, matchup: 2, matchups: 2, game: 1], 1, [],
           'Match One', :text}], [],
         ...}
-
 ```
 
 get the full list of matchup name
 
 ```elixir
-
 result = doc |> xpath(~x"//matchup/name/text()"l) # `l` stands for (l)ist
 assert result == ['Match One', 'Match Two', 'Match Three']
-
 ```
 
 get a list of matchups with different map structure
 
 ```elixir
-
 result = doc |> xpath(
   ~x"//matchups/matchup"l,
   name: ~x"./name/text()",
@@ -113,13 +104,11 @@ assert result == [
   %{name: 'Match Two', winner: %{name: 'Team Two'}},
   %{name: 'Match Three', winner: %{name: 'Team One'}}
 ]
-
 ```
 
 Or directly return a mapping of your liking
 
 ```elixir
-
 result = doc |> xmap(
   matchups: [
     ~x"//matchups/matchup"l,
@@ -146,7 +135,6 @@ assert result == %{
   ],
   last_matchup: %{name: 'Match Three', winner: %{name: 'Team One'}}
 }
-
 ```
 
 ## The ~x Sigil
@@ -175,31 +163,24 @@ is being returned.
 
 Also in the examples section, we always import SweetXml first. This
 makes `x_sigil` available in the current scope. Without it, instead of using
-`~x`, you can do the following
+`~x`, you can use the `%SweetXpath` struct
 
 ```elixir
-
-doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_list: false})
-
+assert ~x"//some/path"e == %SweetXpath{path: '//some/path', is_value: false, is_list: false}
 ```
 
 Note the use of char_list in the path definition.
 
-It is also obvious from iex
+## From Chaining to Nesting
 
-```elixir
+Here's a brief explanation to how nesting came about.
 
-assert ~x"//some/path"e == %SweetXpath{path: '//some/path', is_value: false, is_list: false}
+### Chaining
 
-```
-
-## Chaining
-
-Both `xpath` and `xmap` can take an xml entity type as the first argment.
+Both `xpath` and `xmap` can take an `:xmerl` xml record as the first argment.
 Therefore you can chain calls to these functions like below:
 
 ```elixir
-
 doc
 |> xpath(~x"//li"l)
 |> Enum.map fn (li_node) ->
@@ -208,7 +189,6 @@ doc
     age: li_node |> xpath(~x"./age/text()")
   }
 end
-
 ```
 
 ### Mapping to a structure
@@ -217,14 +197,12 @@ Since the previous example is such a common use case, SweetXml allows you just
 simply do the following
 
 ```elixir
-
 doc
 |> xpath(
   ~x"//li"l,
   name: ~x"./name/text()",
   age: ~x"./age/text()"
 )
-
 ```
 
 ### Nesting
@@ -233,7 +211,6 @@ But what you want is sometimes more complex than just that, SweetXml thus also
 allows nesting
 
 ```elixir
-
 doc
 |> xpath(
   ~x"//li"l,
@@ -244,7 +221,6 @@ doc
   ],
   age: ~x"./age/text()"
 )
-
 ```
 
 For more examples, please take a look at the tests and help.
