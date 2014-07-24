@@ -1,4 +1,229 @@
 SweetXml
 ========
 
-** TODO: Add description **
+`SweetXml` is a thin wrapper around `:xmerl`. It allows you to converts a
+  string or xmlElement record as defined in `:xmerl` to an elixir value such
+  as `map`, `list`, `char_list`, or any combination of these.
+
+
+## Usage
+
+Given a xml document such as below
+
+```xml
+<?xml version="1.05" encoding="UTF-8"?>
+<game>
+  <matchups>
+    <matchup winner-id="1">
+      <name>Match One</name>
+      <teams>
+        <team>
+          <id>1</id>
+          <name>Team One</name>
+        </team>
+        <team>
+          <id>2</id>
+          <name>Team Two</name>
+        </team>
+      </teams>
+    </matchup>
+    <matchup winner-id="2">
+      <name>Match Two</name>
+      <teams>
+        <team>
+          <id>2</id>
+          <name>Team Two</name>
+        </team>
+        <team>
+          <id>3</id>
+          <name>Team Three</name>
+        </team>
+      </teams>
+    </matchup>
+    <matchup winner-id="1">
+      <name>Match Three</name>
+      <teams>
+        <team>
+          <id>1</id>
+          <name>Team One</name>
+        </team>
+        <team>
+          <id>3</id>
+          <name>Team Three</name>
+        </team>
+      </teams>
+    </matchup>
+  </matchups>
+</game>
+```
+We can do the following
+
+```elixir
+
+import SweetXml
+
+doc = "..." # as above
+
+# get the name of the first match
+result = doc |> xpath(~x"//matchup/name/text()") # `sigil_x` for (x)path
+assert result == 'Match One'
+
+# get the xml record of the name of the first match
+result = doc |> xpath(~x"//matchup/name"e) # `e` is the modifier for (e)ntity
+assert result == {:xmlElement, :name, :name, [], {:xmlNamespace, [], []},
+        [matchup: 2, matchups: 2, game: 1], 2, [],
+        [{:xmlText, [name: 2, matchup: 2, matchups: 2, game: 1], 1, [],
+          'Match One', :text}], [],
+        ...}
+
+# get the full list of matchup name
+result = doc |> xpath(~x"//matchup/name/text()"l) # `l` stands for (l)ist
+assert result == ['Match One', 'Match Two', 'Match Three']
+
+# get a list of matchups with different map structure
+result = doc |> xpath(
+  ~x"//matchups/matchup"l,
+  name: ~x"./name/text()",
+  winner: [
+    ~x".//team/id[.=ancestor::matchup/@winner-id]/..",
+    name: ~x"./name/text()"
+  ]
+)
+assert result == [
+  %{name: 'Match One', winner: %{name: 'Team One'}},
+  %{name: 'Match Two', winner: %{name: 'Team Two'}},
+  %{name: 'Match Three', winner: %{name: 'Team One'}}
+]
+
+# or directly return a mapping of your liking
+result = doc |> xmap(
+  matchups: [
+    ~x"//matchups/matchup"l,
+    name: ~x"./name/text()",
+    winner: [
+      ~x".//team/id[.=ancestor::matchup/@winner-id]/..",
+      name: ~x"./name/text()"
+    ]
+  ],
+  last_matchup: [
+    ~x"//matchups/matchup[last()]",
+    name: ~x"./name/text()",
+    winner: [
+      ~x".//team/id[.=ancestor::matchup/@winner-id]/..",
+      name: ~x"./name/text()"
+    ]
+  ]
+)
+assert result == %{
+  matchups: [
+    %{name: 'Match One', winner: %{name: 'Team One'}},
+    %{name: 'Match Two', winner: %{name: 'Team Two'}},
+    %{name: 'Match Three', winner: %{name: 'Team One'}}
+  ],
+  last_matchup: %{name: 'Match Three', winner: %{name: 'Team One'}}
+}
+
+```
+
+## The ~x Sigil
+
+In the above examples, we used the expression `~x"//some/path"` to
+define the path. The reason is it allows us to more precisely specify what
+is being returned.
+
+  * `~x"//some/path"`
+
+    without any modifiers, `xpath/2` will return the value of the entity if
+    the entity is of type `xmlText`, `xmlAttribute`, `xmlPI`, `xmlComment`
+    as defined in `:xmerl`
+
+  * `~x"//some/path"e`
+
+    `e` stands for (e)ntity. This forces `xpath/2` to return the entity with
+    which you can further chain your `xpath/2` call
+
+  * `~x"//some/path"l`
+
+    'l' stands for (l)ist. This forces `xpath/2` to return a list. Without
+    `l`, `xpath/2` will only return the first element of the match
+
+  * `~x"//some/path"el` - mix of the above
+
+Also in the examples section, we always import SweetXml first. This
+makes `x_sigil` available in the current scope. Without it, instead of using
+`~x`, you can do the following
+
+```elixir
+
+iex> doc = "<h1><a>Some linked title</a></h1>"
+iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_list: false})
+'Some linked title'
+
+```
+Note the use of char_list in the path definition.
+
+It is also obvious from iex
+
+```elixir
+
+iex> import SweetXml
+iex> ~x"//some/path"e
+%SweetXpath{path: '//some/path', is_value: false, is_list: false}
+
+```
+
+## Chaining
+
+Both `xpath` and `xmap` can take an xml entity type as the first argment.
+Therefore you can chain calls to these functions like below:
+
+```elixir
+
+doc
+|> xpath(~x"//li"l)
+|> Enum.map fn (li_node) ->
+  %{
+    name: li_node |> xpath(~x"./name/text()"),
+    age: li_node |> xpath(~x"./age/text()")
+  }
+end
+
+```
+
+### Mapping to a structure
+
+Since the previous example is such a common use case, SweetXml allows you just
+simply do the following
+
+```elixir
+
+doc
+|> xpath(
+  ~x"//li"l,
+  name: ~x"./name/text()",
+  age: ~x"./age/text()"
+)
+
+```
+
+### Nesting
+
+But what you want is sometimes more complex than just that, SweetXml thus also
+allows nesting
+
+```elixir
+
+doc
+|> xpath(
+  ~x"//li"l,
+  name: [
+    ~x"./name",
+    first: ~x"./first/text()",
+    last: ~x"./last/text()"
+  ],
+  age: ~x"./age/text()"
+)
+
+```
+
+For more examples, please take a look at the tests and help.
