@@ -2,11 +2,11 @@ SweetXml
 ========
 
 `SweetXml` is a thin wrapper around `:xmerl`. It allows you to converts a
-  string or xmlElement record as defined in `:xmerl` to an elixir value such
-  as `map`, `list`, `char_list`, or any combination of these.
+`string` or `xmlElement` record as defined in `:xmerl` to an elixir value such
+as `map`, `list`, `char_list`, or any combination of these.
 
 
-## Usage
+## Examples
 
 Given a xml document such as below
 
@@ -61,14 +61,23 @@ We can do the following
 ```elixir
 
 import SweetXml
-
 doc = "..." # as above
 
-# get the name of the first match
+```
+
+get the name of the first match
+
+```elixir
+
 result = doc |> xpath(~x"//matchup/name/text()") # `sigil_x` for (x)path
 assert result == 'Match One'
 
-# get the xml record of the name of the first match
+```
+
+get the xml record of the name of the first match
+
+```elixir
+
 result = doc |> xpath(~x"//matchup/name"e) # `e` is the modifier for (e)ntity
 assert result == {:xmlElement, :name, :name, [], {:xmlNamespace, [], []},
         [matchup: 2, matchups: 2, game: 1], 2, [],
@@ -76,11 +85,21 @@ assert result == {:xmlElement, :name, :name, [], {:xmlNamespace, [], []},
           'Match One', :text}], [],
         ...}
 
-# get the full list of matchup name
+```
+
+get the full list of matchup name
+
+```elixir
+
 result = doc |> xpath(~x"//matchup/name/text()"l) # `l` stands for (l)ist
 assert result == ['Match One', 'Match Two', 'Match Three']
 
-# get a list of matchups with different map structure
+```
+
+get a list of matchups with different map structure
+
+```elixir
+
 result = doc |> xpath(
   ~x"//matchups/matchup"l,
   name: ~x"./name/text()",
@@ -95,7 +114,12 @@ assert result == [
   %{name: 'Match Three', winner: %{name: 'Team One'}}
 ]
 
-# or directly return a mapping of your liking
+```
+
+Or directly return a mapping of your liking
+
+```elixir
+
 result = doc |> xmap(
   matchups: [
     ~x"//matchups/matchup"l,
@@ -155,20 +179,17 @@ makes `x_sigil` available in the current scope. Without it, instead of using
 
 ```elixir
 
-iex> doc = "<h1><a>Some linked title</a></h1>"
-iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_list: false})
-'Some linked title'
+doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_list: false})
 
 ```
+
 Note the use of char_list in the path definition.
 
 It is also obvious from iex
 
 ```elixir
 
-iex> import SweetXml
-iex> ~x"//some/path"e
-%SweetXpath{path: '//some/path', is_value: false, is_list: false}
+assert ~x"//some/path"e == %SweetXpath{path: '//some/path', is_value: false, is_list: false}
 
 ```
 
