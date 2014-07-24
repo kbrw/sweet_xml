@@ -8,9 +8,9 @@ defmodule SweetXml.Mixfile do
       elixir: "~> 0.14.2",
       deps: deps,
       package: [
-        contributors: ["Frank Liu"]
+        contributors: ["Frank Liu"],
         licenses: ["MIT"],
-        links: ["https://github.com/gniquil/sweet_xml"],
+        links: [github: "https://github.com/gniquil/sweet_xml"]
       ],
       description: """
       An sweet wrapper of :xmerl to help query xml docs
