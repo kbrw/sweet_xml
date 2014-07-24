@@ -1,0 +1,35 @@
+<?xml version="1.05" encoding="UTF-8"?>
+<html>
+  <head>
+    <title>XML Parsing</title>
+  </head>
+  <body>
+    <p>Neato</p>
+    <ul>
+      <li class="first star" data-index="1">First</li>
+      <li class="second">Second</li>
+      <li class="third">Third</li>
+    </ul>
+    <div>
+      <ul>
+        <li>Forth</li>
+      </ul>
+    </div>
+    <div id="content">
+      <header>Content Header</header>
+      <span class="first badge odd" data-attr="first-half">One</span>
+      <span class="badge" data-attr="first-half">Two</span>
+      <span class="badge odd" data-attr="first-half">Three</span>
+      <span class="badge" data-attr="first-half">Four</span>
+      <span class="badge" data-attr="first-half">Five</span>
+      <span class="badge">Six</span>
+      <span class="badge">Seven</span>
+      <span class="badge">Eight</span>
+      <span class="badge">Nine</span>
+      <span class="badge">Ten</span>
+      <p class='nested-paragraph'>Hello there. <a>link</a></p>
+      <p class="padded-paragraph">Another one. <a>link2</a> More stuff</p>
+    </div>
+    <special_match_key>first star</special_match_key>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.05" encoding="UTF-8"?>
+<game>
+  <matchups>
+    <matchup winner-id="1">
+      <name>Match One</name>
+      <teams>
+        <team>
+          <id>1</id>
+          <name>Team One</name>
+        </team>
+        <team>
+          <id>2</id>
+          <name>Team Two</name>
+        </team>
+      </teams>
+    </matchup>
+    <matchup winner-id="2">
+      <name>Match Two</name>
+      <teams>
+        <team>
+          <id>2</id>
+          <name>Team Two</name>
+        </team>
+        <team>
+          <id>3</id>
+          <name>Team Three</name>
+        </team>
+      </teams>
+    </matchup>
+    <matchup winner-id="1">
+      <name>Match Three</name>
+      <teams>
+        <team>
+          <id>1</id>
+          <name>Team One</name>
+        </team>
+        <team>
+          <id>3</id>
+          <name>Team Three</name>
+        </team>
+      </teams>
+    </matchup>
+  </matchups>
+</game>
