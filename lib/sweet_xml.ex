@@ -258,17 +258,21 @@ defmodule SweetXml do
 
   defp _value(entity) do
     cond do
-      Record.record? entity, :xmlText ->
+      is_record? entity, :xmlText ->
         xmlText(entity, :value)
-      Record.record? entity, :xmlComment ->
+      is_record? entity, :xmlComment ->
         xmlComment(entity, :value)
-      Record.record? entity, :xmlPI ->
+      is_record? entity, :xmlPI ->
         xmlPI(entity, :value)
-      Record.record? entity, :xmlAttribute ->
+      is_record? entity, :xmlAttribute ->
         xmlAttribute(entity, :value)
       true ->
         entity
     end
+  end
+
+  defp is_record?(data, kind) do
+    is_tuple(data) and tuple_size(data) > 0 and :erlang.element(1, data) == kind
   end
 
 end
