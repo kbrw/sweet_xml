@@ -10,7 +10,9 @@ defmodule SweetXml.Mixfile do
       package: [
         contributors: ["Frank Liu"],
         licenses: ["MIT"],
-        links: [github: "https://github.com/gniquil/sweet_xml"]
+        links: %{
+          "GitHub" => "https://github.com/gniquil/sweet_xml"
+        }
       ],
       description: """
       An sweet wrapper of :xmerl to help query xml docs
