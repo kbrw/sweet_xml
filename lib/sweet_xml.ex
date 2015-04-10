@@ -147,6 +147,85 @@ defmodule SweetXml do
     parsed_doc
   end
 
+  @doc """
+  Create an element stream from a xml `doc`.
+
+  - `doc` is the same as in `parse/2` but when it is an enumerable, data will
+    be pulled during the result stream enumeration. (with `parse/2`, xmerl
+    pulls the data from the doc during parsing).
+  - `get_opts` is an anonymous function `fn emit->xmerl_opts` use it to
+    define your :xmerl callbacks and put data into the stream using
+    `emit.(elem)` in the callbacks.
+
+  For example, here you define a stream of all `xmlElement` : 
+
+      iex> import Record
+      iex> doc = ["<h1","><a>Som","e linked title</a><a>other</a></h1>"]
+      iex> SweetXml.stream(doc, fn emit->[
+      iex>  hook_fun: fn
+      iex>    entity,xstate when is_record(entity,:xmlElement)->
+      iex>      emit.(entity); {entity,xstate}
+      iex>    entity,xstate -> {entity,xstate}
+      iex>  end
+      iex> ] end) |> Enum.count
+      3
+  """
+  def stream(doc,get_opts) when is_binary(doc) do
+    stream([doc],get_opts)
+  end
+  def stream([c|_]=doc,get_opts) when is_integer(c) do
+    stream([IO.iodata_to_binary(doc)],get_opts)
+  end
+  def stream(doc,get_opts) do
+    Stream.resource fn->
+      {parent,ref} = waiter = {self,make_ref}
+      opts = get_opts.(fn e->send(parent,{:event,ref,e}) end)
+      pid = spawn fn-> :xmerl_scan.string('', [continuation_opt(doc,waiter)|opts]) end
+      {ref,pid,Process.monitor(pid)}
+    end,fn {ref,pid,monref}=acc->
+      receive do
+        {:DOWN,^monref,_,_,_}->{:halt,acc} ## !!! maybe do something when reason !== :normal
+        {:event,^ref,event}->{[event],acc}
+        {:wait,^ref}-> send(pid,{:continue,ref}); {[],acc}
+      end
+    end,fn _->:ok end
+  end
+
+  @doc """
+  Most common usage of streaming: stream a given tag but
+  "forgot" to add some elements to the dom in order to free memory 
+  during streaming for big file which cannot be entirely in memory.
+
+  - `take_tags` is the list of tags you want to extract
+    each stream element will be `{:tagname,xmlelem}`
+  - `tags_to_forget` is the list of tag which will be "forgotten": 
+     not added to its parent DOM.
+
+      iex> import SweetXml
+      iex> doc = ["<ul><li>l1</li><li>l2","</li><li>l3</li></ul>"]
+      iex> SweetXml.stream_tags(doc,[:li],[:li]) 
+      iex> |> Stream.map(fn {:li,e}->SweetXml.xpath(e,~x"./text()")end)
+      iex> |> Enum.to_list
+      ['l1','l2','l3']
+  """
+  def stream_tags(doc,take_tags,tags_to_forget \\ [],opts \\ []) do
+    doc |> stream(fn emit->[
+        hook_fun: fn
+          entity,xstate when Record.is_record(entity,:xmlElement)->
+            if (name=xmlElement(entity,:name)) in take_tags, 
+              do: emit.({name,entity})
+            {entity,xstate}
+          entity,xstate -> {entity,xstate}
+        end,
+        acc_fun: fn
+          entity,acc,xstate when Record.is_record(entity,:xmlElement)->
+            if xmlElement(entity,:name) in tags_to_forget,
+              do: {acc,xstate}, else: {[entity|acc],xstate}
+          entity,acc,xstate -> {[entity|acc],xstate}
+        end
+    ]++opts end)
+  end
+
   @doc ~S"""
   `xpath` allows you to query an xml document with xpath.
 
@@ -295,8 +374,9 @@ defmodule SweetXml do
           {:suspended,bin,cont}-> 
             case waiter do
               nil -> :ok
-              {parent,ref}->
-                send(parent,{:wait,ref}); receive do {:continue,^ref}->:ok end
+              {parent,ref}-> 
+                send(parent,{:wait,ref})
+                receive do {:continue,^ref}->:ok end
             end
             xcont.(bin,:xmerl_scan.cont_state(cont,xstate))
           {:done,_}->xexc.(xstate)
