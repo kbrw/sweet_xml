@@ -126,12 +126,12 @@ defmodule SweetXml do
 
   Return an `xmlElement` record
   """
-  def parse(doc), do: parse(doc,[])
+  def parse(doc), do: parse(doc, [])
   def parse(doc,options) when is_binary(doc) do
     doc |> :erlang.binary_to_list |> parse(options)
   end
-  def parse(doc,options) do
-    {parsed_doc, _} = :xmerl_scan.string(doc,options)
+  def parse(doc, options) do
+    {parsed_doc, _} = :xmerl_scan.string(doc, options)
     parsed_doc
   end
 
