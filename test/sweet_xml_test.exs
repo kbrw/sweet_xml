@@ -7,13 +7,20 @@ defmodule SweetXmlTest do
   setup do
     simple = File.read!("./test/files/simple.xml")
     complex = File.read!("./test/files/complex.xml")
+    complex_stream = File.stream!("./test/files/complex.xml", [:raw])
+    simple_stream = File.stream!("./test/files/simple_stream.xml", [:raw])
     readme = File.read!("test/files/readme.xml")
-    {:ok, [simple: simple, complex: complex, readme: readme]}
+    {:ok, [simple: simple, complex: complex, readme: readme, complex_stream: complex_stream, simple_stream: simple_stream]}
   end
 
   test "parse", %{simple: doc} do
     result = doc |> parse
     assert xmlElement(result, :name) == :html
+  end
+
+  test "use parse with a stream", %{complex_stream: complex_stream} do
+    result = complex_stream |> parse
+    assert xmlElement(result, :name) == :fantasy_content
   end
 
   test "xpath sigil" do
@@ -40,7 +47,6 @@ defmodule SweetXmlTest do
   end
 
   test "xpath should return values for those entities that have values", %{simple: doc} do
-
     result = doc |> xpath ~x"//li/@class"
     assert result == 'first star'
     result = doc |> xpath ~x"//li/@data-index"
@@ -85,9 +91,7 @@ defmodule SweetXmlTest do
         }
       }
     }
-  end
 
-  test "xpath with multiple level of spec", %{simple: doc} do
     result = doc |> xpath(
       ~x"//html",
       body: [
@@ -112,6 +116,57 @@ defmodule SweetXmlTest do
     }
   end
 
+  test "xpath with multiple level of spec from stream", %{simple_stream: simple_stream} do
+    result = simple_stream |> xmap(
+      html: [
+        ~x"//html",
+        body: [
+          ~x"./body",
+          first_list: [
+            ~x"./ul/li"l,
+            class: ~x"./@class",
+            data_attr: ~x"./@data-attr",
+            text: ~x"./text()"
+          ]
+        ]
+      ]
+    )
+
+    assert result == %{
+      html: %{
+        body: %{
+          first_list: [
+            %{class: 'first star', data_attr: nil, text: '\n        First'},
+            %{class: 'second', data_attr: nil, text: 'Second\n      '},
+            %{class: 'third', data_attr: nil, text: 'Third'}
+          ]
+        }
+      }
+    }
+
+    result = simple_stream |> xpath(
+      ~x"//html",
+      body: [
+        ~x"./body",
+        first_list: [
+          ~x"./ul/li"l,
+          class: ~x"./@class",
+          data_attr: ~x"./@data-attr",
+          text: ~x"./text()"
+        ]
+      ]
+    )
+
+    assert result == %{
+      body: %{
+        first_list: [
+          %{class: 'first star', data_attr: nil, text: '\n        First'},
+          %{class: 'second', data_attr: nil, text: 'Second\n      '},
+          %{class: 'third', data_attr: nil, text: 'Third'}
+        ]
+      }
+    }
+  end
   test "reuse returned nodes", %{simple: doc} do
     result = doc
     |> xpath(~x"//li"l)

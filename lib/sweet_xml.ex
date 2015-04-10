@@ -4,7 +4,7 @@ end
 
 defmodule SweetXml do
   @moduledoc ~S"""
-  `SweetXml` is a thin wrapper around `:xmerl`. It allows you to converts a
+  `SweetXml` is a thin wrapper around `:xmerl`. It allows you to convert a
   string or xmlElement record as defined in `:xmerl` to an elixir value such
   as `map`, `list`, `char_list`, or any combination of these.
 
@@ -123,18 +123,159 @@ defmodule SweetXml do
   end
 
   @doc """
-  `doc` can be a byte list (iodata) or binary, but ultimately converts to iodata as it
-  is required by :xmerl_scan (xmerl takes care of the encoding and convert txt to char_data).
+  `doc` can be
+
+  - a byte list (iodata)
+  - a binary
+  - any enumerable of binaries (for instance `File.stream!/3` result)
+
+  `options` are `xmerl` options described here [http://www.erlang.org/doc/man/xmerl_scan.html](http://www.erlang.org/doc/man/xmerl_scan.html),
+  see [the erlang tutorial](http://www.erlang.org/doc/apps/xmerl/xmerl_examples.html) for usage.
+
+  When `doc` is an enumerable, the `:cont_fun` option cannot be given.
 
   Return an `xmlElement` record
   """
   def parse(doc), do: parse(doc, [])
-  def parse(doc,options) when is_binary(doc) do
+  def parse(doc, options) when is_binary(doc) do
     doc |> :erlang.binary_to_list |> parse(options)
   end
-  def parse(doc, options) do
+  def parse([c | _] = doc, options) when is_integer(c) do
     {parsed_doc, _} = :xmerl_scan.string(doc, options)
     parsed_doc
+  end
+  def parse(doc_enum, options) do
+    {parsed_doc, _} = :xmerl_scan.string('', [continuation_opt(doc_enum) | options])
+    parsed_doc
+  end
+
+  @doc """
+  Most common usage of streaming: stream a given root tag or root tags, and
+  optionally "discard" some dom elements in order to free memory during streaming
+  for big files which cannot fit entirely in memory.
+
+  Note that each matched tag produces it's own tree. If a given tag appears in
+  the discarded options, it is ignored.
+
+  Examples
+
+  - `doc` is an enumerable, data will be pulled during the result stream
+    enumeration. e.g. `File.stream!("some_file.xml")`
+  - `tags` is an atom or a list of atoms you want to extract
+    each stream element will be `{:tagname, xmlelem}`. e.g. :li, :header
+  - `options[:discard]` is the list of tag which will be discarded:
+     not added to its parent DOM.
+
+      iex> import SweetXml
+      iex> doc = ["<ul><li>l1</li><li>l2", "</li><li>l3</li></ul>"]
+      iex> SweetXml.stream_tags(doc, :li, discard: [:li])
+      ...> |> Stream.map(fn {:li, doc} -> doc |> SweetXml.xpath(~x"./text()") end)
+      ...> |> Enum.to_list
+      ['l1', 'l2', 'l3']
+      iex> SweetXml.stream_tags(doc, [:ul, :li])
+      ...> |> Stream.map(fn {_, doc} -> doc |> SweetXml.xpath(~x"./text()") end)
+      ...> |> Enum.to_list
+      ['l1', 'l2', 'l3', nil]
+
+
+  Becareful if you set `options[:discard]`. If any of the discarded tags is nested
+  inside a kept tag, you will not be able to access them.
+
+  Example:
+
+      iex> import SweetXml
+      iex> doc = ["<header>", "<title>XML</title", "><header><title>Nested</title></header></header>"]
+      iex> SweetXml.stream_tags(doc, :header)
+      ...> |> Stream.map(fn {_, doc} -> SweetXml.xpath(doc, ~x".//title/text()") end)
+      ...> |> Enum.to_list
+      ['Nested', 'XML']
+      iex> SweetXml.stream_tags(doc, :header, discard: [:title])
+      ...> |> Stream.map(fn {_, doc} -> SweetXml.xpath(doc, ~x"./title/text()") end)
+      ...> |> Enum.to_list
+      [nil, nil]
+  """
+  def stream_tags(doc, tags, options \\ []) do
+    tags = if is_atom(tags), do: [tags], else: tags
+    options = [discard: []] |> Keyword.merge(options)
+
+    doc |> stream(fn emit ->
+      [
+        hook_fun: fn
+          entity, xstate when Record.is_record(entity, :xmlElement) ->
+            name = xmlElement(entity, :name)
+            if length(tags) == 0 or name in tags do
+              emit.({name, entity})
+            end
+            {entity, xstate}
+          entity, xstate ->
+            {entity, xstate}
+        end,
+        acc_fun: fn
+          entity, acc, xstate when Record.is_record(entity, :xmlElement) ->
+            if xmlElement(entity, :name) in options[:discard] do
+              {acc, xstate}
+            else
+              {[entity | acc], xstate}
+            end
+          entity, acc, xstate ->
+            {[entity | acc], xstate}
+        end
+      ]
+    end)
+  end
+
+  @doc """
+  Create an element stream from a xml `doc`.
+
+  This is a lower level API compared to `SweetXml.stream_elements`. You can use
+  the `emitter` argument to get fine control of what data to be streamed.
+
+  - `doc` is an enumerable, data will be pulled during the result stream
+    enumeration. e.g. `File.stream!("some_file.xml")`
+  - `emitter` is an anonymous function `fn emit -> xmerl_opts` use it to
+    define your :xmerl callbacks and put data into the stream using
+    `emit.(elem)` in the callbacks.
+
+  For example, here you define a stream of all `xmlElement` :
+
+      iex> import Record
+      iex> doc = ["<h1", "><a>Som", "e linked title</a><a>other</a></h1>"]
+      iex> SweetXml.stream(doc, fn emit ->
+      iex>   [
+      iex>     hook_fun: fn
+      iex>       entity, xstate when is_record(entity, :xmlElement)->
+      iex>         emit.(entity)
+      iex>         {entity, xstate}
+      iex>       entity, xstate ->
+      iex>         {entity,xstate}
+      iex>     end
+      iex>   ]
+      iex> end) |> Enum.count
+      3
+  """
+  def stream(doc, emitter) when is_binary(doc) do
+    stream([doc], emitter)
+  end
+  def stream([c | _] = doc, emitter) when is_integer(c) do
+    stream([IO.iodata_to_binary(doc)], emitter)
+  end
+  def stream(doc, emitter) do
+    Stream.resource fn ->
+      {parent, ref} = waiter = {self, make_ref}
+      opts = emitter.(fn e -> send(parent, {:event, ref, e}) end)
+      pid = spawn fn -> :xmerl_scan.string('', [continuation_opt(doc, waiter) | opts]) end
+      {ref, pid, Process.monitor(pid)}
+    end, fn {ref, pid, monref} = acc ->
+      receive do
+        {:DOWN, ^monref, _, _, _} ->
+          {:halt, acc} ## !!! maybe do something when reason !== :normal
+        {:event, ^ref, event} ->
+          {[event], acc}
+        {:wait, ^ref} ->
+          send(pid, {:continue, ref})
+          {[], acc}
+      end
+    end, fn _ -> :ok end
   end
 
   @doc ~S"""
@@ -176,7 +317,7 @@ defmodule SweetXml do
       ...>    )
       %{ul: %{a: 'Two'}}
   """
-  def xpath(parent, spec) when is_bitstring(parent) do
+  def xpath(parent, spec) when not is_tuple(parent) do
     parent |> parse |> xpath(spec)
   end
 
@@ -285,4 +426,52 @@ defmodule SweetXml do
     is_tuple(data) and tuple_size(data) > 0 and :erlang.element(1, data) == kind
   end
 
+  defp continuation_opt(enum, waiter \\ nil) do
+    {
+      :continuation_fun,
+      fn xcont, xexc, xstate ->
+        case :xmerl_scan.cont_state(xstate).({:cont, []}) do
+          {:suspended, bin, cont}->
+            case waiter do
+              nil -> :ok
+              {parent, ref} ->
+                send(parent, {:wait, ref})
+                receive do
+                  {:continue, ^ref} -> :ok
+                end
+            end
+            xcont.(bin, :xmerl_scan.cont_state(cont, xstate))
+          {:done, _} -> xexc.(xstate)
+        end
+      end,
+      &Enumerable.reduce(split_by_whitespace(enum), &1, fn bin, _ -> {:suspend, bin} end)
+    }
+  end
+
+  defp split_by_whitespace(enum) do
+    reducer = fn
+      :last, prev ->
+        {[:erlang.binary_to_list(prev)], :done}
+      bin, prev ->
+        bin = if (prev === ""), do: bin, else: IO.iodata_to_binary([prev, bin])
+        case split_last_whitespace(bin) do
+          :white_bin -> {[], bin}
+          {head, tail} -> {[:erlang.binary_to_list(head)], tail}
+        end
+    end
+
+    Stream.concat(enum, [:last]) |> Stream.transform("", reducer)
+  end
+
+  defp split_last_whitespace(bin), do: split_last_whitespace(byte_size(bin) - 1, bin)
+  defp split_last_whitespace(0, _), do: :white_bin
+  defp split_last_whitespace(size, bin) do
+    case bin do
+      <<_::binary - size(size), h>> <> tail when h == ?\s or h == ?\n or h == ?\r or h == ?\t ->
+        {head, _} = :erlang.split_binary(bin, size + 1)
+        {head, tail}
+      _ ->
+        split_last_whitespace(size - 1, bin)
+    end
+  end
 end
