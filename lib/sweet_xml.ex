@@ -121,8 +121,16 @@ defmodule SweetXml do
   end
 
   @doc """
-  `doc` can be a byte list (iodata) or binary, but ultimately converts to iodata as it
-  is required by :xmerl_scan (xmerl takes care of the encoding and convert txt to char_data).
+  `doc` can be 
+
+  - a byte list (iodata)
+  - a binary
+  - any enumerable of binaries (for instance `File.stream!/3` result)
+
+  `options` are `xmerl` options described here [http://www.erlang.org/doc/man/xmerl_scan.html](http://www.erlang.org/doc/man/xmerl_scan.html),
+  see [the erlang tutorial](http://www.erlang.org/doc/apps/xmerl/xmerl_examples.html) for usage.
+
+  When `doc` is an enumerable, the `:cont_fun` option cannot be given.
 
   Return an `xmlElement` record
   """
@@ -130,8 +138,12 @@ defmodule SweetXml do
   def parse(doc,options) when is_binary(doc) do
     doc |> :erlang.binary_to_list |> parse(options)
   end
-  def parse(doc,options) do
+  def parse([c|_]=doc,options) when is_integer(c) do
     {parsed_doc, _} = :xmerl_scan.string(doc,options)
+    parsed_doc
+  end
+  def parse(doc_enum,options) do
+    {parsed_doc, _} = :xmerl_scan.string('', [continuation_opt(doc_enum)|options])
     parsed_doc
   end
 
@@ -174,7 +186,7 @@ defmodule SweetXml do
       ...>    )
       %{ul: %{a: 'Two'}}
   """
-  def xpath(parent, spec) when is_bitstring(parent) do
+  def xpath(parent, spec) when not is_tuple(parent) do
     parent |> parse |> xpath(spec)
   end
 
@@ -276,4 +288,42 @@ defmodule SweetXml do
     is_tuple(data) and tuple_size(data) > 0 and :erlang.element(1, data) == kind
   end
 
+  defp continuation_opt(enum, waiter \\ nil) do
+    {:continuation_fun,
+     fn xcont,xexc,xstate->
+        case :xmerl_scan.cont_state(xstate).({:cont,[]}) do
+          {:suspended,bin,cont}-> 
+            case waiter do
+              nil -> :ok
+              {parent,ref}->
+                send(parent,{:wait,ref}); receive do {:continue,^ref}->:ok end
+            end
+            xcont.(bin,:xmerl_scan.cont_state(cont,xstate))
+          {:done,_}->xexc.(xstate)
+        end
+     end,
+     &Enumerable.reduce(split_by_whitespace(enum),&1,fn bin,_-> {:suspend,bin} end)}
+   end
+
+  defp split_by_whitespace(enum) do
+    Stream.concat(enum,[:last]) |> Stream.transform("", fn 
+      :last, prev->{[:erlang.binary_to_list(prev)],:done}
+      bin, prev-> 
+        bin = if (prev===""), do: bin, else: IO.iodata_to_binary([prev,bin])
+        case split_last_whitespace(bin) do
+          :white_bin->{[],bin}
+          {head,tail}->{[:erlang.binary_to_list(head)],tail}
+        end
+    end)
+  end
+
+  defp split_last_whitespace(bin), do: split_last_whitespace(byte_size(bin)-1,bin)
+  defp split_last_whitespace(0,_), do: :white_bin
+  defp split_last_whitespace(size,bin) do
+    case bin do
+      <<_::binary-size(size),h>> <> tail when h==?\s or h==?\n or h==?\r or h==?\t-> 
+        {head,_} = :erlang.split_binary(bin,size+1); {head,tail}
+      _ -> split_last_whitespace(size-1,bin)
+    end
+  end
 end

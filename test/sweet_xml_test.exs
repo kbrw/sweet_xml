@@ -7,13 +7,19 @@ defmodule SweetXmlTest do
   setup do
     simple = File.read!("./test/files/simple.xml")
     complex = File.read!("./test/files/complex.xml")
+    complex_stream = File.stream!("./test/files/complex.xml",[:raw])
     readme = File.read!("test/files/readme.xml")
-    {:ok, [simple: simple, complex: complex, readme: readme]}
+    {:ok, [simple: simple, complex: complex, complex_stream: complex_stream, readme: readme]}
   end
 
   test "parse", %{simple: doc} do
     result = doc |> parse
     assert xmlElement(result, :name) == :html
+  end
+
+  test "parse stream", %{complex_stream: stream} do
+    result = stream |> parse
+    assert xmlElement(result, :name) == :fantasy_content
   end
 
   test "xpath sigil" do
