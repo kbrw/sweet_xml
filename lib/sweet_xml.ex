@@ -121,13 +121,13 @@ defmodule SweetXml do
   end
 
   @doc """
-  `doc` can be a char_list or string, but ultimately converts to char_list as it
-  is required by :xmerl_scan
+  `doc` can be a byte list (iodata) or binary, but ultimately converts to iodata as it
+  is required by :xmerl_scan (xmerl takes care of the encoding and convert txt to char_data).
 
   Return an `xmlElement` record
   """
-  def parse(doc) when is_bitstring(doc) do
-    doc |> String.to_char_list |> parse
+  def parse(doc) when is_binary(doc) do
+    doc |> :erlang.binary_to_list |> parse
   end
   def parse(doc) do
     {parsed_doc, _} = :xmerl_scan.string(doc)

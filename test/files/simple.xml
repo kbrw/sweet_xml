@@ -4,7 +4,7 @@
     <title>XML Parsing</title>
   </head>
   <body>
-    <p>Neato</p>
+    <p>Neato €</p>
     <ul>
       <li class="first star" data-index="1">First</li>
       <li class="second">Second</li>

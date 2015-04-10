@@ -280,7 +280,7 @@ defmodule SweetXmlTest do
     assert result == %{
       html: %{
         body: %{
-          p: 'Neato',
+          p: 'Neato €',
           first_list: [
             %{class: 'first star', data_attr: nil, text: 'First'},
             %{class: 'second', data_attr: nil, text: 'Second'},
