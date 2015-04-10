@@ -5,9 +5,9 @@ defmodule SweetXmlStreamTest do
 
   setup do
     simple = File.read!("./test/files/simple_stream.xml")
-    complex_stream = File.stream!("./test/files/complex.xml", [:raw])
-    simple_stream = File.stream!("./test/files/simple_stream.xml", [:raw])
-    {:ok, [complex_stream: complex_stream, simple_stream: simple_stream]}
+    complex_stream = File.stream!("./test/files/complex.xml")
+    simple_stream = File.stream!("./test/files/simple_stream.xml")
+    {:ok, [complex_stream: complex_stream, simple_stream: simple_stream, simple: simple]}
   end
 
   test "streaming tags", %{simple_stream: simple_stream, simple: simple} do

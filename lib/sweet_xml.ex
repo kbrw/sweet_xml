@@ -8,12 +8,18 @@ defmodule SweetXml do
   string or xmlElement record as defined in `:xmerl` to an elixir value such
   as `map`, `list`, `char_list`, or any combination of these.
 
-  `SweetXml` primarily exposes 3 functions
+  For normal sized documents, `SweetXml` primarily exposes 3 functions
 
     * `SweetXml.xpath/2` - return a value based on the xpath expression
     * `SweetXml.xpath/3` - similar to above but allowing nesting of mapping
     * `SweetXml.xmap/2` - return a map with keywords mapped to values returned
       from xpath
+
+  For something larger, `SweetXml` mainly exposes 1 function
+
+    * `SweetXml.stream_tags/3` - stream a given tag or a list of tags, and
+      optionally "discard" some dom elements in order to free memory during
+      streaming for big files which cannot fit entirely in memory
 
   ## Examples
 
@@ -31,7 +37,18 @@ defmodule SweetXml do
       iex> doc |> xpath(~x"//header", message: ~x"./p/text()", a_in_li: ~x".//li/a/text()"l)
       %{a_in_li: ['Two'], message: 'Message'}
 
-  For more examples please see the help for `SweetXml.xpath/2` and `SweetXml.xmap/2`
+  Streaming
+
+      iex> import SweetXml
+      iex> doc = ["<ul><li>l1</li><li>l2", "</li><li>l3</li></ul>"]
+      iex> SweetXml.stream_tags(doc, :li)
+      ...> |> Stream.map(fn {:li, doc} ->
+      ...>      doc |> SweetXml.xpath(~x"./text()")
+      ...>    end)
+      ...> |> Enum.to_list
+      ['l1', 'l2', 'l3']
+
+  For more examples please see help for each individual functions
 
   ## The ~x Sigil
 
@@ -150,21 +167,21 @@ defmodule SweetXml do
   end
 
   @doc """
-  Most common usage of streaming: stream a given root tag or root tags, and
+  Most common usage of streaming: stream a given tag or a list of tags, and
   optionally "discard" some dom elements in order to free memory during streaming
   for big files which cannot fit entirely in memory.
 
   Note that each matched tag produces it's own tree. If a given tag appears in
   the discarded options, it is ignored.
 
-  Examples
-
   - `doc` is an enumerable, data will be pulled during the result stream
     enumeration. e.g. `File.stream!("some_file.xml")`
-  - `tags` is an atom or a list of atoms you want to extract
-    each stream element will be `{:tagname, xmlelem}`. e.g. :li, :header
+  - `tags` is an atom or a list of atoms you want to extract. Each stream element
+    will be `{:tagname, xmlelem}`. e.g. :li, :header
   - `options[:discard]` is the list of tag which will be discarded:
      not added to its parent DOM.
+
+  Examples:
 
       iex> import SweetXml
       iex> doc = ["<ul><li>l1</li><li>l2", "</li><li>l3</li></ul>"]
@@ -181,7 +198,7 @@ defmodule SweetXml do
   Becareful if you set `options[:discard]`. If any of the discarded tags is nested
   inside a kept tag, you will not be able to access them.
 
-  Example:
+  Examples:
 
       iex> import SweetXml
       iex> doc = ["<header>", "<title>XML</title", "><header><title>Nested</title></header></header>"]
@@ -193,6 +210,7 @@ defmodule SweetXml do
       ...> |> Stream.map(fn {_, doc} -> SweetXml.xpath(doc, ~x"./title/text()") end)
       ...> |> Enum.to_list
       [nil, nil]
+
   """
   def stream_tags(doc, tags, options \\ []) do
     tags = if is_atom(tags), do: [tags], else: tags
@@ -227,12 +245,12 @@ defmodule SweetXml do
   @doc """
   Create an element stream from a xml `doc`.
 
-  This is a lower level API compared to `SweetXml.stream_elements`. You can use
-  the `emitter` argument to get fine control of what data to be streamed.
+  This is a lower level API compared to `SweetXml.stream_tags`. You can use
+  the `options_callback` argument to get fine control of what data to be streamed.
 
   - `doc` is an enumerable, data will be pulled during the result stream
     enumeration. e.g. `File.stream!("some_file.xml")`
-  - `emitter` is an anonymous function `fn emit -> xmerl_opts` use it to
+  - `options_callback` is an anonymous function `fn emit -> xmerl_opts` use it to
     define your :xmerl callbacks and put data into the stream using
     `emit.(elem)` in the callbacks.
 
@@ -241,28 +259,28 @@ defmodule SweetXml do
       iex> import Record
       iex> doc = ["<h1", "><a>Som", "e linked title</a><a>other</a></h1>"]
       iex> SweetXml.stream(doc, fn emit ->
-      iex>   [
-      iex>     hook_fun: fn
-      iex>       entity, xstate when is_record(entity, :xmlElement)->
-      iex>         emit.(entity)
-      iex>         {entity, xstate}
-      iex>       entity, xstate ->
-      iex>         {entity,xstate}
-      iex>     end
-      iex>   ]
-      iex> end) |> Enum.count
+      ...>   [
+      ...>     hook_fun: fn
+      ...>       entity, xstate when is_record(entity, :xmlElement)->
+      ...>         emit.(entity)
+      ...>         {entity, xstate}
+      ...>       entity, xstate ->
+      ...>         {entity,xstate}
+      ...>     end
+      ...>   ]
+      ...> end) |> Enum.count
       3
   """
-  def stream(doc, emitter) when is_binary(doc) do
-    stream([doc], emitter)
+  def stream(doc, options_callback) when is_binary(doc) do
+    stream([doc], options_callback)
   end
-  def stream([c | _] = doc, emitter) when is_integer(c) do
-    stream([IO.iodata_to_binary(doc)], emitter)
+  def stream([c | _] = doc, options_callback) when is_integer(c) do
+    stream([IO.iodata_to_binary(doc)], options_callback)
   end
-  def stream(doc, emitter) do
+  def stream(doc, options_callback) do
     Stream.resource fn ->
       {parent, ref} = waiter = {self, make_ref}
-      opts = emitter.(fn e -> send(parent, {:event, ref, e}) end)
+      opts = options_callback.(fn e -> send(parent, {:event, ref, e}) end)
       pid = spawn fn -> :xmerl_scan.string('', [continuation_opt(doc, waiter) | opts]) end
       {ref, pid, Process.monitor(pid)}
     end, fn {ref, pid, monref} = acc ->

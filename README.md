@@ -224,3 +224,59 @@ doc
 ```
 
 For more examples, please take a look at the tests and help.
+
+## Streaming
+
+`SweetXml` now also supports streaming in various forms. Here's a sample xml doc.
+Notice the certain lines have xml tags that span multiple lines.
+
+```xml
+<?xml version="1.05" encoding="UTF-8"?>
+<html>
+  <head>
+    <title>XML Parsing</title>
+    <head><title>Nested Head</title></head>
+  </head>
+  <body>
+    <p>Neato €</p><ul>
+      <li class="first star" data-index="1">
+        First</li><li class="second">Second
+      </li><li
+            class="third">Third</li>
+    </ul>
+    <div>
+      <ul>
+        <li>Forth</li>
+      </ul>
+    </div>
+    <special_match_key>first star</special_match_key>
+  </body>
+</html>
+```
+
+### Working with `File.stream!`
+
+Working with streams is exactly the same as working with binaries.
+
+```elixir
+File.stream!("file_above.xml") |> xpath(...)
+```
+
+### `SweetXml` element streaming
+
+Once you have a file stream, you may not want to work with the entire document to
+save memory.
+
+```elixir
+file_stream = File.stream!("file_above.xml")
+
+result = file_stream
+|> stream_tags([:li, :special_match_key])
+|> Stream.map(fn
+    {_, doc} ->
+      xpath(doc, ~x"./text()")
+  end)
+|> Enum.to_list
+
+assert result == ['\n        First', 'Second\n      ', 'Third', 'Forth', 'first star']
+```

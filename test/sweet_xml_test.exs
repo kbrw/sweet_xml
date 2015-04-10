@@ -7,8 +7,8 @@ defmodule SweetXmlTest do
   setup do
     simple = File.read!("./test/files/simple.xml")
     complex = File.read!("./test/files/complex.xml")
-    complex_stream = File.stream!("./test/files/complex.xml", [:raw])
-    simple_stream = File.stream!("./test/files/simple_stream.xml", [:raw])
+    complex_stream = File.stream!("./test/files/complex.xml")
+    simple_stream = File.stream!("./test/files/simple_stream.xml")
     readme = File.read!("test/files/readme.xml")
     {:ok, [simple: simple, complex: complex, readme: readme, complex_stream: complex_stream, simple_stream: simple_stream]}
   end
