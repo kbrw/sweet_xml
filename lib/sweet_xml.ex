@@ -78,6 +78,8 @@ defmodule SweetXml do
   Record.defrecord :xmlComment, Record.extract(:xmlComment, from_lib: "xmerl/include/xmerl.hrl")
   Record.defrecord :xmlPI, Record.extract(:xmlPI, from_lib: "xmerl/include/xmerl.hrl")
   Record.defrecord :xmlDocument, Record.extract(:xmlDocument, from_lib: "xmerl/include/xmerl.hrl")
+  Record.defrecord :xmlObj, Record.extract(:xmlObj, from_lib: "xmerl/include/xmerl.hrl")
+
 
   @doc ~s"""
   `sigil_x/2` simply returns a `SweetXpath` struct, with modifiers converted to
@@ -187,7 +189,12 @@ defmodule SweetXml do
         current_entities
       end
     else
-      current_entity = List.first(current_entities)
+      current_entity = if is_record?(current_entities, :xmlObj) do
+        current_entities
+      else
+        List.first(current_entities)
+      end
+      #current_entity = List.first(current_entities)
       if is_value do
         _value current_entity
       else
@@ -267,6 +274,8 @@ defmodule SweetXml do
         xmlPI(entity, :value)
       is_record? entity, :xmlAttribute ->
         xmlAttribute(entity, :value)
+      is_record? entity, :xmlObj ->
+        xmlObj(entity, :value)
       true ->
         entity
     end

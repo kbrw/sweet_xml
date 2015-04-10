@@ -294,4 +294,24 @@ defmodule SweetXmlTest do
     }
   end
 
+  test "XPath functions that return xmlObj", %{simple: simple} do
+    #Get name of root tag
+    result = simple |> xpath(~x"name(.)")
+
+    assert result == 'html'
+
+    #Get number of li elements
+    result = simple |> xpath(~x"count(//li)")
+
+    assert result == 4
+
+    #True and false
+    result = simple |> xpath(~x"true()")
+
+    assert result == true
+
+    result = simple |> xpath(~x"false()")
+
+    assert result == false
+  end
 end
