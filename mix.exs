@@ -25,6 +25,9 @@ defmodule SweetXml.Mixfile do
   end
 
   defp deps do
-    []
+    [
+      {:ex_doc, "~> 0.7", only: :dev},
+      {:markdown, github: "devinus/markdown"}
+    ]
   end
 end
