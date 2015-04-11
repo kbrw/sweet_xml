@@ -4,11 +4,11 @@ defmodule SweetXml.Mixfile do
   def project do
     [
       app: :sweet_xml,
-      version: "0.1.1",
+      version: "0.2.0",
       elixir: "~> 1.0.0-rc2",
       deps: deps,
       package: [
-        contributors: ["Frank Liu"],
+        contributors: ["Frank Liu", "Arnaud Wetzel", "Tomáš Brukner"],
         licenses: ["MIT"],
         links: %{
           "GitHub" => "https://github.com/gniquil/sweet_xml"
