@@ -214,7 +214,12 @@ defmodule SweetXml do
   """
   def stream_tags(doc, tags, options \\ []) do
     tags = if is_atom(tags), do: [tags], else: tags
-    options = [discard: []] |> Keyword.merge(options)
+
+    {discard_tags, xmerl_options} = if options[:discard] do
+      {options[:discard], Keyword.delete(options, :discard)}
+    else
+      {[], options}
+    end
 
     doc |> stream(fn emit ->
       [
@@ -230,7 +235,7 @@ defmodule SweetXml do
         end,
         acc_fun: fn
           entity, acc, xstate when Record.is_record(entity, :xmlElement) ->
-            if xmlElement(entity, :name) in options[:discard] do
+            if xmlElement(entity, :name) in discard_tags do
               {acc, xstate}
             else
               {[entity | acc], xstate}
@@ -238,7 +243,7 @@ defmodule SweetXml do
           entity, acc, xstate ->
             {[entity | acc], xstate}
         end
-      ]
+      ] ++ xmerl_options
     end)
   end
 
