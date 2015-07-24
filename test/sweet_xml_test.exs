@@ -24,11 +24,13 @@ defmodule SweetXmlTest do
   end
 
   test "xpath sigil" do
-    assert ~x"//header/text()" == %SweetXpath{path: '//header/text()', is_value: true, is_list: false}
-    assert ~x"//header/text()"e == %SweetXpath{path: '//header/text()', is_value: false, is_list: false}
-    assert ~x"//header/text()"l == %SweetXpath{path: '//header/text()', is_value: true, is_list: true}
-    assert ~x"//header/text()"el == %SweetXpath{path: '//header/text()', is_value: false, is_list: true}
-    assert ~x"//header/text()"le == %SweetXpath{path: '//header/text()', is_value: false, is_list: true}
+    assert ~x"//header/text()" == %SweetXpath{path: '//header/text()', is_value: true, is_string: false, is_list: false}
+    assert ~x"//header/text()"e == %SweetXpath{path: '//header/text()', is_value: false, is_string: false, is_list: false}
+    assert ~x"//header/text()"l == %SweetXpath{path: '//header/text()', is_value: true, is_string: false, is_list: true}
+    assert ~x"//header/text()"el == %SweetXpath{path: '//header/text()', is_value: false, is_string: false, is_list: true}
+    assert ~x"//header/text()"le == %SweetXpath{path: '//header/text()', is_value: false, is_string: false, is_list: true}
+    assert ~x"//header/text()"sl == %SweetXpath{path: '//header/text()', is_value: true, is_string: true, is_list: true}
+    assert ~x"//header/text()"ls == %SweetXpath{path: '//header/text()', is_value: true, is_string: true, is_list: true}
   end
 
   test "xpath with sweet_xpath as only argment", %{simple: doc} do
@@ -38,8 +40,14 @@ defmodule SweetXmlTest do
     result = doc |> xpath ~x"//header/text()"
     assert result == 'Content Header'
 
+    result = doc |> xpath ~x"//header/text()"s
+    assert result == "Content Header"
+
     result = doc |> xpath ~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"l
     assert result == ['One', 'Two', 'Three', 'Four', 'Five']
+
+    result = doc |> xpath ~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"ls
+    assert result == ["One", "Two", "Three", "Four", "Five"]
 
     result = doc |> xpath ~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"le
     assert length(result) == 5
