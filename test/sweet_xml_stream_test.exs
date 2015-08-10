@@ -1,5 +1,5 @@
 defmodule SweetXmlStreamTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false #async disabled to allows to count ports
 
   import SweetXml
 
@@ -10,7 +10,21 @@ defmodule SweetXmlStreamTest do
     {:ok, [complex_stream: complex_stream, simple_stream: simple_stream, simple: simple]}
   end
 
-  test "streaming tags", %{simple_stream: simple_stream, simple: simple} do
+  test "partial streaming closes the underlying stream", %{simple_stream: simple_stream} do
+    nb_ports_before_stream = Enum.count(Port.list)
+    simple_stream |> stream_tags(:span) |> Enum.take(2)
+    :timer.sleep(50) # the stream is halted in another process, so wait a bit
+    assert nb_ports_before_stream == Enum.count(Port.list)
+  end
+
+  test "full streaming closes the underlying stream, even if data after xml", %{simple_stream: simple_stream} do
+    nb_ports_before_stream = Enum.count(Port.list)
+    simple_stream |> stream_tags(:span) |> Enum.take(200)
+    :timer.sleep(50) # the stream is halted in another process, so wait a bit
+    assert nb_ports_before_stream == Enum.count(Port.list)
+  end
+
+  test "streaming tags", %{simple_stream: simple_stream} do
     result = simple_stream
     |> stream_tags([:li, :special_match_key], discard: [:li, :special_match_key])
     |> Stream.map(fn

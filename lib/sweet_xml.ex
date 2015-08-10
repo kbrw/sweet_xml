@@ -162,7 +162,7 @@ defmodule SweetXml do
     parsed_doc
   end
   def parse(doc_enum, options) do
-    {parsed_doc, _} = :xmerl_scan.string('', [continuation_opt(doc_enum) | options])
+    {parsed_doc, _} = :xmerl_scan.string('', options ++ continuation_opts(doc_enum))
     parsed_doc
   end
 
@@ -286,19 +286,24 @@ defmodule SweetXml do
     Stream.resource fn ->
       {parent, ref} = waiter = {self, make_ref}
       opts = options_callback.(fn e -> send(parent, {:event, ref, e}) end)
-      pid = spawn fn -> :xmerl_scan.string('', [continuation_opt(doc, waiter) | opts]) end
+      pid = spawn fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
       {ref, pid, Process.monitor(pid)}
     end, fn {ref, pid, monref} = acc ->
       receive do
         {:DOWN, ^monref, _, _, _} ->
-          {:halt, acc} ## !!! maybe do something when reason !== :normal
+          {:halt, :parse_ended} ## !!! maybe do something when reason !== :normal
         {:event, ^ref, event} ->
           {[event], acc}
         {:wait, ^ref} ->
           send(pid, {:continue, ref})
           {[], acc}
       end
-    end, fn _ -> :ok end
+    end, fn
+      :parse_ended -> :ok
+      {ref, pid, monref} ->
+        Process.demonitor(monref)
+        flush_halt(pid, ref)
+    end
   end
 
   @doc ~S"""
@@ -449,26 +454,37 @@ defmodule SweetXml do
     is_tuple(data) and tuple_size(data) > 0 and :erlang.element(1, data) == kind
   end
 
-  defp continuation_opt(enum, waiter \\ nil) do
-    {
-      :continuation_fun,
-      fn xcont, xexc, xstate ->
-        case :xmerl_scan.cont_state(xstate).({:cont, []}) do
-          {:suspended, bin, cont}->
-            case waiter do
-              nil -> :ok
-              {parent, ref} ->
-                send(parent, {:wait, ref})
-                receive do
-                  {:continue, ^ref} -> :ok
-                end
-            end
-            xcont.(bin, :xmerl_scan.cont_state(cont, xstate))
-          {:done, _} -> xexc.(xstate)
-        end
-      end,
-      &Enumerable.reduce(split_by_whitespace(enum), &1, fn bin, _ -> {:suspend, bin} end)
-    }
+  defp continuation_opts(enum, waiter \\ nil) do
+    [{
+       :continuation_fun,
+       fn xcont, xexc, xstate ->
+         case :xmerl_scan.cont_state(xstate).({:cont, []}) do
+           {:suspended, bin, cont}->
+             case waiter do
+               nil -> :ok
+               {parent, ref} ->
+                 send(parent, {:wait, ref}) # continuation behaviour, pause and wait stream decision
+                 receive do
+                   {:continue, ^ref} -> # stream continuation fun has been called: parse to find more elements
+                     :ok
+                   {:halt, ^ref} -> # stream halted: halt the underlying stream and exit parsing process
+                     cont.({:halt, []})
+                     exit(:normal)
+                 end
+             end
+             xcont.(bin, :xmerl_scan.cont_state(cont, xstate))
+           {:done, _} -> xexc.(xstate)
+         end
+       end,
+       &Enumerable.reduce(split_by_whitespace(enum), &1, fn bin, _ -> {:suspend, bin} end)
+     },
+     {
+       :close_fun,
+       fn xstate -> # make sure the XML end halts the binary stream (if more bytes are available after XML)
+         :xmerl_scan.cont_state(xstate).({:halt,[]})
+         xstate
+       end
+     }]
   end
 
   defp split_by_whitespace(enum) do
@@ -495,6 +511,15 @@ defmodule SweetXml do
         {head, tail}
       _ ->
         split_last_whitespace(size - 1, bin)
+    end
+  end
+
+  defp flush_halt(pid, ref) do
+    receive do
+      {:event, ^ref, _} ->
+        flush_halt(pid, ref) # flush all emitted elems after :halt
+      {:wait, ^ref} ->
+        send(pid, {:halt, ref}) # tell the continuation function to halt the underlying stream
     end
   end
 end
