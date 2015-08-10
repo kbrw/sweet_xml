@@ -1,5 +1,5 @@
 defmodule SweetXpath do
-  defstruct path: ".", is_value: true, is_list: false
+  defstruct path: ".", is_value: true, is_string: false, is_list: false
 end
 
 defmodule SweetXml do
@@ -74,12 +74,19 @@ defmodule SweetXml do
 
     * `~x"//some/path"el` - mix of the above
 
+    * `~x"//some/path"s`
+
+      's' stands for (s)tring. This forces `xpath/2` to return the value as
+      string instead of a char list.
+
+    * `~x"//some/path"sl` - string list.
+
   Notice also in the examples section, we always import SweetXml first. This
   makes `x_sigil` available in the current scope. Without it, instead of using
   `~x`, you can do the following
 
       iex> doc = "<h1><a>Some linked title</a></h1>"
-      iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_list: false})
+      iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_string: false,  is_list: false})
       'Some linked title'
 
   Note the use of char_list in the path definition.
@@ -103,15 +110,15 @@ defmodule SweetXml do
   boolean fields
 
       iex> SweetXml.sigil_x("//some/path", 'e')
-      %SweetXpath{path: '//some/path', is_value: false, is_list: false}
+      %SweetXpath{path: '//some/path', is_value: false, is_string: false, is_list: false}
 
   or you can simply import and use the `~x` expression
 
       iex> import SweetXml
       iex> ~x"//some/path"e
-      %SweetXpath{path: '//some/path', is_value: false, is_list: false}
+      %SweetXpath{path: '//some/path', is_value: false, is_string: false, is_list: false}
 
-  Valid modifiers are `e` and `l`. Below is the full explanation
+  Valid modifiers are `e`, `s` and `l`. Below is the full explanation
 
     * `~x"//some/path"`
 
@@ -130,11 +137,19 @@ defmodule SweetXml do
       `l`, `xpath/2` will only return the first element of the match
 
     * `~x"//some/path"el` - mix of the above
+
+    * `~x"//some/path"s`
+
+      's' stands for (s)tring. This forces `xpath/2` to return the value as
+      string instead of a char list.
+
+    * `~x"//some/path"sl` - string list.
   """
   def sigil_x(path, modifiers \\ '') do
     %SweetXpath{
       path: String.to_char_list(path),
       is_value: not ?e in modifiers,
+      is_string: ?s in modifiers,
       is_list: ?l in modifiers
     }
   end
@@ -349,11 +364,15 @@ defmodule SweetXml do
     parent |> parse |> xpath(spec)
   end
 
-  def xpath(parent, %SweetXpath{path: path, is_value: is_value, is_list: is_list}) do
+  def xpath(parent, %SweetXpath{path: path, is_value: is_value, is_string: is_string, is_list: is_list}) do
     current_entities = :xmerl_xpath.string(path, parent)
     if is_list do
       if is_value do
-        current_entities |> Enum.map &(_value(&1))
+        if is_string do
+          current_entities |> Enum.map &(_value(&1) |> to_string)
+        else
+          current_entities |> Enum.map &(_value(&1))
+        end
       else
         current_entities
       end
@@ -365,7 +384,11 @@ defmodule SweetXml do
       end
       #current_entity = List.first(current_entities)
       if is_value do
-        _value current_entity
+        if is_string do
+          current_entity |> _value |> to_string
+        else
+          current_entity |> _value
+        end
       else
         current_entity
       end
