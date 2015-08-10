@@ -8,7 +8,7 @@ defmodule SweetXml.Mixfile do
       elixir: "~> 1.0.0-rc2",
       deps: deps,
       package: [
-        contributors: ["Frank Liu", "Arnaud Wetzel", "Tomáš Brukner"],
+        contributors: ["Frank Liu", "Arnaud Wetzel", "Tomáš Brukner", "Vinícius Sales"],
         licenses: ["MIT"],
         links: %{
           "GitHub" => "https://github.com/gniquil/sweet_xml"

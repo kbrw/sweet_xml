@@ -161,12 +161,19 @@ is being returned.
 
   * `~x"//some/path"el` - mix of the above
 
+  * `~x"//some/path"s`
+
+    's' stands for (s)tring. This forces `xpath/2` to return the value as
+    string instead of a char list.
+
+  * `~x"//some/path"sl` - string list.
+
 Also in the examples section, we always import SweetXml first. This
 makes `x_sigil` available in the current scope. Without it, instead of using
 `~x`, you can use the `%SweetXpath` struct
 
 ```elixir
-assert ~x"//some/path"e == %SweetXpath{path: '//some/path', is_value: false, is_list: false}
+assert ~x"//some/path"e == %SweetXpath{path: '//some/path', is_value: false, is_string: false, is_list: false}
 ```
 
 Note the use of char_list in the path definition.

@@ -86,7 +86,7 @@ defmodule SweetXml do
   `~x`, you can do the following
 
       iex> doc = "<h1><a>Some linked title</a></h1>"
-      iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_string: false,  is_list: false})
+      iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_string: false, is_list: false})
       'Some linked title'
 
   Note the use of char_list in the path definition.
