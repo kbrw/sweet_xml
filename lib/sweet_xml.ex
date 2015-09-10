@@ -1,5 +1,5 @@
 defmodule SweetXpath do
-  defstruct path: ".", is_value: true, is_string: false, is_list: false
+  defstruct path: ".", is_value: true, is_string: false, is_list: false, is_keyword: false
 end
 
 defmodule SweetXml do
@@ -74,6 +74,10 @@ defmodule SweetXml do
 
     * `~x"//some/path"el` - mix of the above
 
+    * `~x"//some/path"k`
+
+      'k' stands for (K)eyword. This forces `xpath/2` to return a Keyword instead of a Map.
+
     * `~x"//some/path"s`
 
       's' stands for (s)tring. This forces `xpath/2` to return the value as
@@ -86,7 +90,7 @@ defmodule SweetXml do
   `~x`, you can do the following
 
       iex> doc = "<h1><a>Some linked title</a></h1>"
-      iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_string: false, is_list: false})
+      iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_string: false, is_list: false, is_keyword: false})
       'Some linked title'
 
   Note the use of char_list in the path definition.
@@ -110,15 +114,15 @@ defmodule SweetXml do
   boolean fields
 
       iex> SweetXml.sigil_x("//some/path", 'e')
-      %SweetXpath{path: '//some/path', is_value: false, is_string: false, is_list: false}
+      %SweetXpath{path: '//some/path', is_value: false, is_string: false, is_list: false, is_keyword: false}
 
   or you can simply import and use the `~x` expression
 
       iex> import SweetXml
       iex> ~x"//some/path"e
-      %SweetXpath{path: '//some/path', is_value: false, is_string: false, is_list: false}
+      %SweetXpath{path: '//some/path', is_value: false, is_string: false, is_list: false, is_keyword: false}
 
-  Valid modifiers are `e`, `s` and `l`. Below is the full explanation
+  Valid modifiers are `e`, `s`, `l` and `k`. Below is the full explanation
 
     * `~x"//some/path"`
 
@@ -138,6 +142,10 @@ defmodule SweetXml do
 
     * `~x"//some/path"el` - mix of the above
 
+    * `~x"//some/path"k`
+
+      'k' stands for (K)eyword. This forces `xpath/2` to return a Keyword instead of a Map.
+
     * `~x"//some/path"s`
 
       's' stands for (s)tring. This forces `xpath/2` to return the value as
@@ -150,7 +158,8 @@ defmodule SweetXml do
       path: String.to_char_list(path),
       is_value: not ?e in modifiers,
       is_string: ?s in modifiers,
-      is_list: ?l in modifiers
+      is_list: ?l in modifiers,
+      is_keyword: ?k in modifiers
     }
   end
 
@@ -364,7 +373,7 @@ defmodule SweetXml do
     parent |> parse |> xpath(spec)
   end
 
-  def xpath(parent, %SweetXpath{path: path, is_value: is_value, is_string: is_string, is_list: is_list}) do
+  def xpath(parent, %SweetXpath{path: path, is_value: is_value, is_string: is_string, is_list: is_list, is_keyword: _is_keyword}) do
     current_entities = :xmerl_xpath.string(path, parent)
     if is_list do
       if is_value do
@@ -398,10 +407,10 @@ defmodule SweetXml do
   def xpath(parent, sweet_xpath, subspec) do
     if sweet_xpath.is_list do
       current_entities = xpath(parent, sweet_xpath)
-      Enum.map(current_entities, fn (entity) -> xmap(entity, subspec) end)
+      Enum.map(current_entities, fn (entity) -> xmap(entity, subspec, sweet_xpath.is_keyword) end)
     else
       current_entity = xpath(parent, sweet_xpath)
-      xmap(current_entity, subspec)
+      xmap(current_entity, subspec, sweet_xpath.is_keyword)
     end
   end
 
@@ -440,19 +449,39 @@ defmodule SweetXml do
       ...>      ]
       ...>    )
       %{message: 'Message', ul: %{a: 'Two'}}
+      iex> doc
+      ...> |> xmap(
+      ...>      message: ~x"//p/text()",
+      ...>      ul: [
+      ...>        ~x"//ul"k,
+      ...>        a: ~x"./li/a/text()"
+      ...>      ]
+      ...>    )
+      %{message: 'Message', ul: [a: 'Two']}
+      iex> doc
+      ...> |> xmap([
+      ...>      message: ~x"//p/text()",
+      ...>      ul: [
+      ...>        ~x"//ul",
+      ...>        a: ~x"./li/a/text()"
+      ...>      ]
+      ...>    ], true)
+      [message: 'Message', ul: %{a: 'Two'}]
   """
-  def xmap(_, []) do
-    %{}
-  end
+  def xmap(parent, mapping), do: xmap(parent, mapping, false)
 
-  def xmap(parent, [{label, spec} | tail]) when is_list(spec) do
-    result = xmap(parent, tail)
+  def xmap(_, [], _is_keyword = false), do: %{}
+
+  def xmap(_, [], _is_keyword = true), do: []
+
+  def xmap(parent, [{label, spec} | tail], is_keyword) when is_list(spec) do
     [sweet_xpath | subspec] = spec
+    result = xmap(parent, tail, is_keyword)
     Dict.put result, label, xpath(parent, sweet_xpath, subspec)
   end
 
-  def xmap(parent, [{label, sweet_xpath} | tail]) do
-    result = xmap(parent, tail)
+  def xmap(parent, [{label, sweet_xpath} | tail], is_keyword) do
+    result = xmap(parent, tail, is_keyword)
     Dict.put result, label, xpath(parent, sweet_xpath)
   end
 

@@ -24,13 +24,14 @@ defmodule SweetXmlTest do
   end
 
   test "xpath sigil" do
-    assert ~x"//header/text()" == %SweetXpath{path: '//header/text()', is_value: true, is_string: false, is_list: false}
-    assert ~x"//header/text()"e == %SweetXpath{path: '//header/text()', is_value: false, is_string: false, is_list: false}
-    assert ~x"//header/text()"l == %SweetXpath{path: '//header/text()', is_value: true, is_string: false, is_list: true}
-    assert ~x"//header/text()"el == %SweetXpath{path: '//header/text()', is_value: false, is_string: false, is_list: true}
-    assert ~x"//header/text()"le == %SweetXpath{path: '//header/text()', is_value: false, is_string: false, is_list: true}
-    assert ~x"//header/text()"sl == %SweetXpath{path: '//header/text()', is_value: true, is_string: true, is_list: true}
-    assert ~x"//header/text()"ls == %SweetXpath{path: '//header/text()', is_value: true, is_string: true, is_list: true}
+    assert ~x"//header/text()" == %SweetXpath{path: '//header/text()', is_value: true, is_string: false, is_list: false, is_keyword: false}
+    assert ~x"//header/text()"e == %SweetXpath{path: '//header/text()', is_value: false, is_string: false, is_list: false, is_keyword: false}
+    assert ~x"//header/text()"l == %SweetXpath{path: '//header/text()', is_value: true, is_string: false, is_list: true, is_keyword: false}
+    assert ~x"//header/text()"k == %SweetXpath{path: '//header/text()', is_value: true, is_string: false, is_list: false, is_keyword: true}
+    assert ~x"//header/text()"el == %SweetXpath{path: '//header/text()', is_value: false, is_string: false, is_list: true, is_keyword: false}
+    assert ~x"//header/text()"le == %SweetXpath{path: '//header/text()', is_value: false, is_string: false, is_list: true, is_keyword: false}
+    assert ~x"//header/text()"sl == %SweetXpath{path: '//header/text()', is_value: true, is_string: true, is_list: true, is_keyword: false}
+    assert ~x"//header/text()"ls == %SweetXpath{path: '//header/text()', is_value: true, is_string: true, is_list: true, is_keyword: false}
   end
 
   test "xpath with sweet_xpath as only argment", %{simple: doc} do
@@ -318,6 +319,21 @@ defmodule SweetXmlTest do
       %{name: 'Match One', winner: %{name: 'Team One'}},
       %{name: 'Match Two', winner: %{name: 'Team Two'}},
       %{name: 'Match Three', winner: %{name: 'Team One'}}
+    ]
+
+    # get a list of matchups with keyword structure preserving order defined in spec
+    result = readme |> xpath(
+      ~x"//matchups/matchup"lk,
+      name: ~x"./name/text()",
+      winner: [
+        ~x".//team/id[.=ancestor::matchup/@winner-id]/..",
+        name: ~x"./name/text()"
+      ]
+    )
+    assert result == [
+      [name: 'Match One', winner: %{name: 'Team One'}],
+      [name: 'Match Two', winner: %{name: 'Team Two'}],
+      [name: 'Match Three', winner: %{name: 'Team One'}]
     ]
 
     # get a map with lots of nesting
