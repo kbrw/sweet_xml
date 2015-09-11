@@ -393,4 +393,13 @@ defmodule SweetXmlTest do
 
     assert result == false
   end
+
+  test "xpath with route that doesn't exist", %{simple: simple} do
+    assert xpath(simple, ~x"//ListBucketResult"o,
+        name: ~x"./Name/text()"s,
+        is_truncated: ~x"./IsTruncated/text()"s,
+        owner: [
+            ~x"./Owner",
+            id: ~x"./ID/text()"s]) == nil
+  end
 end
