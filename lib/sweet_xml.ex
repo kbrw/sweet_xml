@@ -416,7 +416,7 @@ defmodule SweetXml do
   def xpath(parent, sweet_xpath, subspec) do
     if sweet_xpath.is_list do
       current_entities = xpath(parent, sweet_xpath)
-      Enum.map(current_entities, fn (entity) -> xmap(entity, subspec, sweet_xpath.is_keyword) end)
+      Enum.map(current_entities, fn (entity) -> xmap(entity, subspec, sweet_xpath) end)
     else
       current_entity = xpath(parent, sweet_xpath)
       xmap(current_entity, subspec, sweet_xpath)

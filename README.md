@@ -160,15 +160,19 @@ is being returned.
     `l`, `xpath/2` will only return the first element of the match
 
   * `~x"//some/path"k`
-  
+
      'k' stands for (K)eyword. This forces `xpath/2` to return a Keyword instead of a Map.
-     
+
   * `~x"//some/path"el` - mix of the above
 
   * `~x"//some/path"s`
 
     's' stands for (s)tring. This forces `xpath/2` to return the value as
     string instead of a char list.
+
+  * `x"//some/path"o`
+
+    'o' stands for (O)ptional. This allows the path to not exist, and will return nil.
 
   * `~x"//some/path"sl` - string list.
 
