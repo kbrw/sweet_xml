@@ -1,5 +1,5 @@
 defmodule SweetXpath do
-  defstruct path: ".", is_value: true, is_string: false, is_list: false, is_keyword: false
+  defstruct path: ".", is_value: true, is_list: false, is_keyword: false, cast_to: false
 end
 
 defmodule SweetXml do
@@ -90,7 +90,7 @@ defmodule SweetXml do
   `~x`, you can do the following
 
       iex> doc = "<h1><a>Some linked title</a></h1>"
-      iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, is_string: false, is_list: false, is_keyword: false})
+      iex> doc |> SweetXml.xpath(%SweetXpath{path: '//a/text()', is_value: true, cast_to: false, is_list: false, is_keyword: false})
       'Some linked title'
 
   Note the use of char_list in the path definition.
@@ -114,13 +114,13 @@ defmodule SweetXml do
   boolean fields
 
       iex> SweetXml.sigil_x("//some/path", 'e')
-      %SweetXpath{path: '//some/path', is_value: false, is_string: false, is_list: false, is_keyword: false}
+      %SweetXpath{path: '//some/path', is_value: false, cast_to: false, is_list: false, is_keyword: false}
 
   or you can simply import and use the `~x` expression
 
       iex> import SweetXml
       iex> ~x"//some/path"e
-      %SweetXpath{path: '//some/path', is_value: false, is_string: false, is_list: false, is_keyword: false}
+      %SweetXpath{path: '//some/path', is_value: false, cast_to: false, is_list: false, is_keyword: false}
 
   Valid modifiers are `e`, `s`, `l` and `k`. Below is the full explanation
 
@@ -152,14 +152,25 @@ defmodule SweetXml do
       string instead of a char list.
 
     * `~x"//some/path"sl` - string list.
+
+    * `~x"//some/path"i`
+
+      'i' stands for (i)nteger. This forces `xpath/2` to return the value as
+      integer instead of a char list.
+
+    * `~x"//some/path"il` - integer list
   """
   def sigil_x(path, modifiers \\ '') do
     %SweetXpath{
       path: String.to_char_list(path),
       is_value: not ?e in modifiers,
-      is_string: ?s in modifiers,
       is_list: ?l in modifiers,
-      is_keyword: ?k in modifiers
+      is_keyword: ?k in modifiers,
+      cast_to: cond do
+        ?s in modifiers -> :string
+        ?i in modifiers -> :integer
+        :otherwise -> false
+      end
     }
   end
 
@@ -373,24 +384,16 @@ defmodule SweetXml do
     parent |> parse |> xpath(spec)
   end
 
-  def xpath(parent, %SweetXpath{is_list: true, is_value: true, is_string: true} = spec) do
-    get_current_entities(parent, spec) |> Enum.map &(_value(&1) |> to_string)
-  end
-
-  def xpath(parent, %SweetXpath{is_list: true, is_value: true, is_string: false} = spec) do
-    get_current_entities(parent, spec) |> Enum.map &(_value(&1))
+  def xpath(parent, %SweetXpath{is_list: true, is_value: true, cast_to: cast} = spec) do
+    get_current_entities(parent, spec) |> Enum.map &(_value(&1) |> to_cast(cast))
   end
 
   def xpath(parent, %SweetXpath{is_list: true, is_value: false} = spec) do
     get_current_entities(parent, spec)
   end
 
-  def xpath(parent, %SweetXpath{is_list: false, is_value: true, is_string: true} = spec) do
-    get_current_entities(parent, spec) |> _value |> to_string
-  end
-
-  def xpath(parent, %SweetXpath{is_list: false, is_value: true, is_string: false} = spec) do
-    get_current_entities(parent, spec) |> _value
+  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: cast} = spec) do
+    get_current_entities(parent, spec) |> _value |> to_cast(cast)
   end
 
   def xpath(parent, %SweetXpath{is_list: false, is_value: false} = spec) do
@@ -581,5 +584,9 @@ defmodule SweetXml do
       List.first(ret)
     end
   end
+
+  defp to_cast(value, false), do: value
+  defp to_cast(value, :string), do: to_string(value)
+  defp to_cast(value, :integer), do: String.to_integer(to_string(value))
 
 end
