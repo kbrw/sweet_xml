@@ -373,36 +373,30 @@ defmodule SweetXml do
     parent |> parse |> xpath(spec)
   end
 
-  def xpath(parent, %SweetXpath{path: path, is_value: is_value, is_string: is_string, is_list: is_list, is_keyword: _is_keyword}) do
-    current_entities = :xmerl_xpath.string(path, parent)
-    if is_list do
-      if is_value do
-        if is_string do
-          current_entities |> Enum.map &(_value(&1) |> to_string)
-        else
-          current_entities |> Enum.map &(_value(&1))
-        end
-      else
-        current_entities
-      end
-    else
-      current_entity = if is_record?(current_entities, :xmlObj) do
-        current_entities
-      else
-        List.first(current_entities)
-      end
-      #current_entity = List.first(current_entities)
-      if is_value do
-        if is_string do
-          current_entity |> _value |> to_string
-        else
-          current_entity |> _value
-        end
-      else
-        current_entity
-      end
-    end
+  def xpath(parent, %SweetXpath{is_list: true, is_value: true, is_string: true} = spec) do
+    get_current_entities(parent, spec) |> Enum.map &(_value(&1) |> to_string)
   end
+
+  def xpath(parent, %SweetXpath{is_list: true, is_value: true, is_string: false} = spec) do
+    get_current_entities(parent, spec) |> Enum.map &(_value(&1))
+  end
+
+  def xpath(parent, %SweetXpath{is_list: true, is_value: false} = spec) do
+    get_current_entities(parent, spec)
+  end
+
+  def xpath(parent, %SweetXpath{is_list: false, is_value: true, is_string: true} = spec) do
+    get_current_entities(parent, spec) |> _value |> to_string
+  end
+
+  def xpath(parent, %SweetXpath{is_list: false, is_value: true, is_string: false} = spec) do
+    get_current_entities(parent, spec) |> _value
+  end
+
+  def xpath(parent, %SweetXpath{is_list: false, is_value: false} = spec) do
+    get_current_entities(parent, spec)
+  end
+
 
   def xpath(parent, sweet_xpath, subspec) do
     if sweet_xpath.is_list do
@@ -574,4 +568,18 @@ defmodule SweetXml do
         send(pid, {:halt, ref}) # tell the continuation function to halt the underlying stream
     end
   end
+
+  defp get_current_entities(parent, %SweetXpath{path: path, is_list: true}) do
+    :xmerl_xpath.string(path, parent)
+  end
+
+  defp get_current_entities(parent, %SweetXpath{path: path, is_list: false}) do
+    ret = :xmerl_xpath.string(path, parent)
+    if is_record?(ret, :xmlObj) do
+      ret
+    else
+      List.first(ret)
+    end
+  end
+
 end
