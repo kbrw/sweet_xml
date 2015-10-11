@@ -1,5 +1,5 @@
 defmodule SweetXpath do
-  defstruct path: ".", is_value: true, is_string: false, is_list: false, is_keyword: false
+  defstruct path: ".", is_value: true, is_string: false, is_list: false, is_keyword: false, is_optional: false
 end
 
 defmodule SweetXml do
@@ -83,6 +83,10 @@ defmodule SweetXml do
       's' stands for (s)tring. This forces `xpath/2` to return the value as
       string instead of a char list.
 
+    * `x"//some/path"o`
+
+      'o' stands for (O)ptional. This allows the path to not exist, and will return nil.
+
     * `~x"//some/path"sl` - string list.
 
   Notice also in the examples section, we always import SweetXml first. This
@@ -151,6 +155,10 @@ defmodule SweetXml do
       's' stands for (s)tring. This forces `xpath/2` to return the value as
       string instead of a char list.
 
+    * `x"//some/path"o`
+
+      'o' stands for (O)ptional. This allows the path to not exist, and will return nil.
+
     * `~x"//some/path"sl` - string list.
   """
   def sigil_x(path, modifiers \\ '') do
@@ -159,7 +167,8 @@ defmodule SweetXml do
       is_value: not ?e in modifiers,
       is_string: ?s in modifiers,
       is_list: ?l in modifiers,
-      is_keyword: ?k in modifiers
+      is_keyword: ?k in modifiers,
+      is_optional: ?o in modifiers
     }
   end
 
@@ -407,10 +416,10 @@ defmodule SweetXml do
   def xpath(parent, sweet_xpath, subspec) do
     if sweet_xpath.is_list do
       current_entities = xpath(parent, sweet_xpath)
-      Enum.map(current_entities, fn (entity) -> xmap(entity, subspec, sweet_xpath.is_keyword) end)
+      Enum.map(current_entities, fn (entity) -> xmap(entity, subspec, sweet_xpath) end)
     else
       current_entity = xpath(parent, sweet_xpath)
-      xmap(current_entity, subspec, sweet_xpath.is_keyword)
+      xmap(current_entity, subspec, sweet_xpath)
     end
   end
 
@@ -468,11 +477,15 @@ defmodule SweetXml do
       ...>    ], true)
       [message: 'Message', ul: %{a: 'Two'}]
   """
-  def xmap(parent, mapping), do: xmap(parent, mapping, false)
+  def xmap(parent, mapping), do: xmap(parent, mapping, %{is_keyword: false})
 
-  def xmap(_, [], _is_keyword = false), do: %{}
+  def xmap(nil, _, %{is_optional: true}), do: nil
 
-  def xmap(_, [], _is_keyword = true), do: []
+  def xmap(parent, [], atom) when is_atom(atom), do: xmap(parent, [], %{is_keyword: atom})
+
+  def xmap(_, [], %{is_keyword: false}), do: %{}
+
+  def xmap(_, [], %{is_keyword: true}), do: []
 
   def xmap(parent, [{label, spec} | tail], is_keyword) when is_list(spec) do
     [sweet_xpath | subspec] = spec
