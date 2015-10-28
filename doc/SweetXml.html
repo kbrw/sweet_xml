@@ -25,7 +25,7 @@
     </script>
 
     <section id="content">
-      <div class="breadcrumbs">sweet_xml v0.4.0 &rarr; <a href="overview.html">Overview</a> &rarr; <a href="SweetXml.html">SweetXml</a></div>
+      <div class="breadcrumbs">sweet_xml v0.5.0 &rarr; <a href="overview.html">Overview</a> &rarr; <a href="SweetXml.html">SweetXml</a></div>
       <h1>
         SweetXml
         
@@ -125,7 +125,7 @@ string instead of a char list.</p>
 makes <code class="inline">x_sigil</code> available in the current scope. Without it, instead of using
 <code class="inline">~x</code>, you can do the following</p>
 <pre><code class="iex elixir">iex&gt; doc = &quot;&lt;h1&gt;&lt;a&gt;Some linked title&lt;/a&gt;&lt;/h1&gt;&quot;
-iex&gt; doc |&gt; SweetXml.xpath(%SweetXpath{path: &#39;//a/text()&#39;, is_value: true, is_string: false, is_list: false, is_keyword: false})
+iex&gt; doc |&gt; SweetXml.xpath(%SweetXpath{path: &#39;//a/text()&#39;, is_value: true, cast_to: false, is_list: false, is_keyword: false})
 &#39;Some linked title&#39;</code></pre>
 <p>Note the use of char_list in the path definition.</p>
 
@@ -340,11 +340,11 @@ see <a href="http://www.erlang.org/doc/apps/xmerl/xmerl_examples.html">the erlan
     <p><a href="#sigil_x/2"><code class="inline">sigil_x/2</code></a> simply returns a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> struct, with modifiers converted to
 boolean fields</p>
 <pre><code class="iex elixir">iex&gt; SweetXml.sigil_x(&quot;//some/path&quot;, &#39;e&#39;)
-%SweetXpath{path: &#39;//some/path&#39;, is_value: false, is_string: false, is_list: false, is_keyword: false}</code></pre>
+%SweetXpath{path: &#39;//some/path&#39;, is_value: false, cast_to: false, is_list: false, is_keyword: false}</code></pre>
 <p>or you can simply import and use the <code class="inline">~x</code> expression</p>
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; ~x&quot;//some/path&quot;e
-%SweetXpath{path: &#39;//some/path&#39;, is_value: false, is_string: false, is_list: false, is_keyword: false}</code></pre>
+%SweetXpath{path: &#39;//some/path&#39;, is_value: false, cast_to: false, is_list: false, is_keyword: false}</code></pre>
 <p>Valid modifiers are <code class="inline">e</code>, <code class="inline">s</code>, <code class="inline">l</code> and <code class="inline">k</code>. Below is the full explanation</p>
 <ul>
 <li><p><code class="inline">~x&quot;//some/path&quot;</code></p>
@@ -372,7 +372,13 @@ string instead of a char list.</p>
 <li><p><code class="inline">x&quot;//some/path&quot;o</code></p>
 <p>‘o’ stands for (O)ptional. This allows the path to not exist, and will return nil.</p>
 </li>
-<li><code class="inline">~x&quot;//some/path&quot;sl</code> - string list.
+<li><p><code class="inline">~x&quot;//some/path&quot;sl</code> - string list.</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;i</code></p>
+<p>‘i’ stands for (i)nteger. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return the value as
+integer instead of a char list.</p>
+</li>
+<li><code class="inline">~x&quot;//some/path&quot;il</code> - integer list
 </li>
 </ul>
 
