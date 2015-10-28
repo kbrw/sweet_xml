@@ -25,7 +25,7 @@
     </script>
 
     <section id="content">
-      <div class="breadcrumbs">sweet_xml v0.3.0 &rarr; <a href="overview.html">Overview</a> &rarr; <a href="SweetXml.html">SweetXml</a></div>
+      <div class="breadcrumbs">sweet_xml v0.4.0 &rarr; <a href="overview.html">Overview</a> &rarr; <a href="SweetXml.html">SweetXml</a></div>
       <h1>
         SweetXml
         
@@ -47,47 +47,38 @@
 
       
         <section id="moduledoc" class="docstring">
-          <p><a href="SweetXml.html"><code>SweetXml</code></a> is a thin wrapper around <code>:xmerl</code>. It allows you to convert a
-string or xmlElement record as defined in <code>:xmerl</code> to an elixir value such
-as <code>map</code>, <code>list</code>, <code>char_list</code>, or any combination of these.</p>
-
-<p>For normal sized documents, <a href="SweetXml.html"><code>SweetXml</code></a> primarily exposes 3 functions</p>
-
+          <p><a href="SweetXml.html"><code class="inline">SweetXml</code></a> is a thin wrapper around <code class="inline">:xmerl</code>. It allows you to convert a
+string or xmlElement record as defined in <code class="inline">:xmerl</code> to an elixir value such
+as <code class="inline">map</code>, <code class="inline">list</code>, <code class="inline">char_list</code>, or any combination of these.</p>
+<p>For normal sized documents, <a href="SweetXml.html"><code class="inline">SweetXml</code></a> primarily exposes 3 functions</p>
 <ul>
-<li><a href="SweetXml.html#xpath/2"><code>SweetXml.xpath/2</code></a> - return a value based on the xpath expression</li>
-<li><a href="SweetXml.html#xpath/3"><code>SweetXml.xpath/3</code></a> - similar to above but allowing nesting of mapping</li>
-<li><a href="SweetXml.html#xmap/2"><code>SweetXml.xmap/2</code></a> - return a map with keywords mapped to values returned
-from xpath</li>
+<li><a href="SweetXml.html#xpath/2"><code class="inline">SweetXml.xpath/2</code></a> - return a value based on the xpath expression
+</li>
+<li><a href="SweetXml.html#xpath/3"><code class="inline">SweetXml.xpath/3</code></a> - similar to above but allowing nesting of mapping
+</li>
+<li><a href="SweetXml.html#xmap/2"><code class="inline">SweetXml.xmap/2</code></a> - return a map with keywords mapped to values returned
+from xpath
+</li>
 </ul>
-
-<p>For something larger, <a href="SweetXml.html"><code>SweetXml</code></a> mainly exposes 1 function</p>
-
+<p>For something larger, <a href="SweetXml.html"><code class="inline">SweetXml</code></a> mainly exposes 1 function</p>
 <ul>
-<li><a href="SweetXml.html#stream_tags/3"><code>SweetXml.stream_tags/3</code></a> - stream a given tag or a list of tags, and
-optionally &quot;discard&quot; some dom elements in order to free memory during
-streaming for big files which cannot fit entirely in memory</li>
+<li><a href="SweetXml.html#stream_tags/3"><code class="inline">SweetXml.stream_tags/3</code></a> - stream a given tag or a list of tags, and
+optionally “discard” some dom elements in order to free memory during
+streaming for big files which cannot fit entirely in memory
+</li>
 </ul>
-
 <h2>Examples</h2>
-
 <p>Simple Xpath</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;h1&gt;&lt;a&gt;Some linked title&lt;/a&gt;&lt;/h1&gt;&quot;
 iex&gt; doc |&gt; xpath(~x&quot;//a/text()&quot;)
-&#39;Some linked title&#39;
-</code></pre>
-
+&#39;Some linked title&#39;</code></pre>
 <p>Nested Mapping</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;body&gt;&lt;header&gt;&lt;p&gt;Message&lt;/p&gt;&lt;ul&gt;&lt;li&gt;One&lt;/li&gt;&lt;li&gt;&lt;a&gt;Two&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/header&gt;&lt;/body&gt;&quot;
 iex&gt; doc |&gt; xpath(~x&quot;//header&quot;, message: ~x&quot;./p/text()&quot;, a_in_li: ~x&quot;.//li/a/text()&quot;l)
-%{a_in_li: [&#39;Two&#39;], message: &#39;Message&#39;}
-</code></pre>
-
+%{a_in_li: [&#39;Two&#39;], message: &#39;Message&#39;}</code></pre>
 <p>Streaming</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = [&quot;&lt;ul&gt;&lt;li&gt;l1&lt;/li&gt;&lt;li&gt;l2&quot;, &quot;&lt;/li&gt;&lt;li&gt;l3&lt;/li&gt;&lt;/ul&gt;&quot;]
 iex&gt; SweetXml.stream_tags(doc, :li)
@@ -95,48 +86,47 @@ iex&gt; SweetXml.stream_tags(doc, :li)
 ...&gt;      doc |&gt; SweetXml.xpath(~x&quot;./text()&quot;)
 ...&gt;    end)
 ...&gt; |&gt; Enum.to_list
-[&#39;l1&#39;, &#39;l2&#39;, &#39;l3&#39;]
-</code></pre>
-
+[&#39;l1&#39;, &#39;l2&#39;, &#39;l3&#39;]</code></pre>
 <p>For more examples please see help for each individual functions</p>
-
 <h2>The ~x Sigil</h2>
-
-<p>Notice in the above examples, we used the expression <code>~x&quot;//a/text()&quot;</code> to
+<p>Notice in the above examples, we used the expression <code class="inline">~x&quot;//a/text()&quot;</code> to
 define the path. The reason is it allows us to more precisely specify what
 is being returned.</p>
-
 <ul>
-<li><p><code>~x&quot;//some/path&quot;</code></p>
-
-<p>without any modifiers, <a href="#xpath/2"><code>xpath/2</code></a> will return the value of the entity if
-the entity is of type <code>xmlText</code>, <code>xmlAttribute</code>, <code>xmlPI</code>, <code>xmlComment</code>
-as defined in <code>:xmerl</code></p></li>
-<li><p><code>~x&quot;//some/path&quot;e</code></p>
-
-<p><code>e</code> stands for (e)ntity. This forces <a href="#xpath/2"><code>xpath/2</code></a> to return the entity with
-which you can further chain your <a href="#xpath/2"><code>xpath/2</code></a> call</p></li>
-<li><p><code>~x&quot;//some/path&quot;l</code></p>
-
-<p>&#39;l&#39; stands for (l)ist. This forces <a href="#xpath/2"><code>xpath/2</code></a> to return a list. Without
-<code>l</code>, <a href="#xpath/2"><code>xpath/2</code></a> will only return the first element of the match</p></li>
-<li><p><code>~x&quot;//some/path&quot;el</code> - mix of the above</p></li>
-<li><p><code>~x&quot;//some/path&quot;s</code></p>
-
-<p>&#39;s&#39; stands for (s)tring. This forces <a href="#xpath/2"><code>xpath/2</code></a> to return the value as
-string instead of a char list.</p></li>
-<li><p><code>~x&quot;//some/path&quot;sl</code> - string list.</p></li>
+<li><p><code class="inline">~x&quot;//some/path&quot;</code></p>
+<p>without any modifiers, <a href="#xpath/2"><code class="inline">xpath/2</code></a> will return the value of the entity if
+the entity is of type <code class="inline">xmlText</code>, <code class="inline">xmlAttribute</code>, <code class="inline">xmlPI</code>, <code class="inline">xmlComment</code>
+as defined in <code class="inline">:xmerl</code></p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;e</code></p>
+<p><code class="inline">e</code> stands for (e)ntity. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return the entity with
+which you can further chain your <a href="#xpath/2"><code class="inline">xpath/2</code></a> call</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;l</code></p>
+<p>‘l’ stands for (l)ist. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return a list. Without
+<code class="inline">l</code>, <a href="#xpath/2"><code class="inline">xpath/2</code></a> will only return the first element of the match</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;el</code> - mix of the above</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;k</code></p>
+<p>‘k’ stands for (K)eyword. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return a Keyword instead of a Map.</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;s</code></p>
+<p>‘s’ stands for (s)tring. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return the value as
+string instead of a char list.</p>
+</li>
+<li><p><code class="inline">x&quot;//some/path&quot;o</code></p>
+<p>‘o’ stands for (O)ptional. This allows the path to not exist, and will return nil.</p>
+</li>
+<li><code class="inline">~x&quot;//some/path&quot;sl</code> - string list.
+</li>
 </ul>
-
 <p>Notice also in the examples section, we always import SweetXml first. This
-makes <code>x_sigil</code> available in the current scope. Without it, instead of using
-<code>~x</code>, you can do the following</p>
-
+makes <code class="inline">x_sigil</code> available in the current scope. Without it, instead of using
+<code class="inline">~x</code>, you can do the following</p>
 <pre><code class="iex elixir">iex&gt; doc = &quot;&lt;h1&gt;&lt;a&gt;Some linked title&lt;/a&gt;&lt;/h1&gt;&quot;
-iex&gt; doc |&gt; SweetXml.xpath(%SweetXpath{path: &#39;//a/text()&#39;, is_value: true, is_string: false, is_list: false})
-&#39;Some linked title&#39;
-</code></pre>
-
+iex&gt; doc |&gt; SweetXml.xpath(%SweetXpath{path: &#39;//a/text()&#39;, is_value: true, is_string: false, is_list: false, is_keyword: false})
+&#39;Some linked title&#39;</code></pre>
 <p>Note the use of char_list in the path definition.</p>
 
         </section>
@@ -150,7 +140,7 @@ iex&gt; doc |&gt; SweetXml.xpath(%SweetXpath{path: &#39;//a/text()&#39;, is_valu
           <tr>
   <td class="summary_signature"><a href="#parse/1">parse(doc)</a></td>
   
-    <td class="summary_synopsis"><p><code>doc</code> can be</p>
+    <td class="summary_synopsis"><p><code class="inline">doc</code> can be</p>
 </td>
   
 </tr>
@@ -161,7 +151,7 @@ iex&gt; doc |&gt; SweetXml.xpath(%SweetXpath{path: &#39;//a/text()&#39;, is_valu
 <tr>
   <td class="summary_signature"><a href="#sigil_x/2">sigil_x(path, modifiers \\ [])</a></td>
   
-    <td class="summary_synopsis"><p><a href="#sigil_x/2"><code>sigil_x/2</code></a> simply returns a <a href="SweetXpath.html"><code>SweetXpath</code></a> struct, with modifiers converted to
+    <td class="summary_synopsis"><p><a href="#sigil_x/2"><code class="inline">sigil_x/2</code></a> simply returns a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> struct, with modifiers converted to
 boolean fields</p>
 </td>
   
@@ -169,7 +159,7 @@ boolean fields</p>
 <tr>
   <td class="summary_signature"><a href="#stream/2">stream(doc, options_callback)</a></td>
   
-    <td class="summary_synopsis"><p>Create an element stream from a xml <code>doc</code></p>
+    <td class="summary_synopsis"><p>Create an element stream from a xml <code class="inline">doc</code></p>
 </td>
   
 </tr>
@@ -177,16 +167,20 @@ boolean fields</p>
   <td class="summary_signature"><a href="#stream_tags/3">stream_tags(doc, tags, options \\ [])</a></td>
   
     <td class="summary_synopsis"><p>Most common usage of streaming: stream a given tag or a list of tags, and
-optionally &quot;discard&quot; some dom elements in order to free memory during streaming
+optionally “discard” some dom elements in order to free memory during streaming
 for big files which cannot fit entirely in memory</p>
 </td>
   
 </tr>
 <tr>
-  <td class="summary_signature"><a href="#xmap/2">xmap(parent, list2)</a></td>
+  <td class="summary_signature"><a href="#xmap/2">xmap(parent, mapping)</a></td>
   
-    <td class="summary_synopsis"><p><code>xmap</code> returns a mapping with each value being the result of <code>xpath</code></p>
+    <td class="summary_synopsis"><p><code class="inline">xmap</code> returns a mapping with each value being the result of <code class="inline">xpath</code></p>
 </td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#xmap/3">xmap(parent, arg2, atom)</a></td>
   
 </tr>
 <tr>
@@ -272,7 +266,7 @@ for big files which cannot fit entirely in memory</p>
 <tr>
   <td class="summary_signature"><a href="#xpath/2">xpath(parent, spec)</a></td>
   
-    <td class="summary_synopsis"><p><code>xpath</code> allows you to query an xml document with xpath</p>
+    <td class="summary_synopsis"><p><code class="inline">xpath</code> allows you to query an xml document with xpath</p>
 </td>
   
 </tr>
@@ -300,20 +294,19 @@ for big files which cannot fit entirely in memory</p>
   </div>
   
   <section class="docstring">
-    <p><code>doc</code> can be</p>
-
+    <p><code class="inline">doc</code> can be</p>
 <ul>
-<li>a byte list (iodata)</li>
-<li>a binary</li>
-<li>any enumerable of binaries (for instance <code>File.stream!/3</code> result)</li>
+<li>a byte list (iodata)
+</li>
+<li>a binary
+</li>
+<li>any enumerable of binaries (for instance <code class="inline">File.stream!/3</code> result)
+</li>
 </ul>
-
-<p><code>options</code> are <code>xmerl</code> options described here <a href="http://www.erlang.org/doc/man/xmerl_scan.html">http://www.erlang.org/doc/man/xmerl_scan.html</a>,
+<p><code class="inline">options</code> are <code class="inline">xmerl</code> options described here <a href="http://www.erlang.org/doc/man/xmerl_scan.html"><a href="http://www.erlang.org/doc/man/xmerl_scan.html">http://www.erlang.org/doc/man/xmerl_scan.html</a></a>,
 see <a href="http://www.erlang.org/doc/apps/xmerl/xmerl_examples.html">the erlang tutorial</a> for usage.</p>
-
-<p>When <code>doc</code> is an enumerable, the <code>:cont_fun</code> option cannot be given.</p>
-
-<p>Return an <code>xmlElement</code> record</p>
+<p>When <code class="inline">doc</code> is an enumerable, the <code class="inline">:cont_fun</code> option cannot be given.</p>
+<p>Return an <code class="inline">xmlElement</code> record</p>
 
   </section>
   
@@ -344,42 +337,43 @@ see <a href="http://www.erlang.org/doc/apps/xmerl/xmerl_examples.html">the erlan
   </div>
   
   <section class="docstring">
-    <p><a href="#sigil_x/2"><code>sigil_x/2</code></a> simply returns a <a href="SweetXpath.html"><code>SweetXpath</code></a> struct, with modifiers converted to
+    <p><a href="#sigil_x/2"><code class="inline">sigil_x/2</code></a> simply returns a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> struct, with modifiers converted to
 boolean fields</p>
-
 <pre><code class="iex elixir">iex&gt; SweetXml.sigil_x(&quot;//some/path&quot;, &#39;e&#39;)
-%SweetXpath{path: &#39;//some/path&#39;, is_value: false, is_string: false, is_list: false}
-</code></pre>
-
-<p>or you can simply import and use the <code>~x</code> expression</p>
-
+%SweetXpath{path: &#39;//some/path&#39;, is_value: false, is_string: false, is_list: false, is_keyword: false}</code></pre>
+<p>or you can simply import and use the <code class="inline">~x</code> expression</p>
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; ~x&quot;//some/path&quot;e
-%SweetXpath{path: &#39;//some/path&#39;, is_value: false, is_string: false, is_list: false}
-</code></pre>
-
-<p>Valid modifiers are <code>e</code>, <code>s</code> and <code>l</code>. Below is the full explanation</p>
-
+%SweetXpath{path: &#39;//some/path&#39;, is_value: false, is_string: false, is_list: false, is_keyword: false}</code></pre>
+<p>Valid modifiers are <code class="inline">e</code>, <code class="inline">s</code>, <code class="inline">l</code> and <code class="inline">k</code>. Below is the full explanation</p>
 <ul>
-<li><p><code>~x&quot;//some/path&quot;</code></p>
-
-<p>without any modifiers, <a href="#xpath/2"><code>xpath/2</code></a> will return the value of the entity if
-the entity is of type <code>xmlText</code>, <code>xmlAttribute</code>, <code>xmlPI</code>, <code>xmlComment</code>
-as defined in <code>:xmerl</code></p></li>
-<li><p><code>~x&quot;//some/path&quot;e</code></p>
-
-<p><code>e</code> stands for (e)ntity. This forces <a href="#xpath/2"><code>xpath/2</code></a> to return the entity with
-which you can further chain your <a href="#xpath/2"><code>xpath/2</code></a> call</p></li>
-<li><p><code>~x&quot;//some/path&quot;l</code></p>
-
-<p>&#39;l&#39; stands for (l)ist. This forces <a href="#xpath/2"><code>xpath/2</code></a> to return a list. Without
-<code>l</code>, <a href="#xpath/2"><code>xpath/2</code></a> will only return the first element of the match</p></li>
-<li><p><code>~x&quot;//some/path&quot;el</code> - mix of the above</p></li>
-<li><p><code>~x&quot;//some/path&quot;s</code></p>
-
-<p>&#39;s&#39; stands for (s)tring. This forces <a href="#xpath/2"><code>xpath/2</code></a> to return the value as
-string instead of a char list.</p></li>
-<li><p><code>~x&quot;//some/path&quot;sl</code> - string list.</p></li>
+<li><p><code class="inline">~x&quot;//some/path&quot;</code></p>
+<p>without any modifiers, <a href="#xpath/2"><code class="inline">xpath/2</code></a> will return the value of the entity if
+the entity is of type <code class="inline">xmlText</code>, <code class="inline">xmlAttribute</code>, <code class="inline">xmlPI</code>, <code class="inline">xmlComment</code>
+as defined in <code class="inline">:xmerl</code></p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;e</code></p>
+<p><code class="inline">e</code> stands for (e)ntity. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return the entity with
+which you can further chain your <a href="#xpath/2"><code class="inline">xpath/2</code></a> call</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;l</code></p>
+<p>‘l’ stands for (l)ist. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return a list. Without
+<code class="inline">l</code>, <a href="#xpath/2"><code class="inline">xpath/2</code></a> will only return the first element of the match</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;el</code> - mix of the above</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;k</code></p>
+<p>‘k’ stands for (K)eyword. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return a Keyword instead of a Map.</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;s</code></p>
+<p>‘s’ stands for (s)tring. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return the value as
+string instead of a char list.</p>
+</li>
+<li><p><code class="inline">x&quot;//some/path&quot;o</code></p>
+<p>‘o’ stands for (O)ptional. This allows the path to not exist, and will return nil.</p>
+</li>
+<li><code class="inline">~x&quot;//some/path&quot;sl</code> - string list.
+</li>
 </ul>
 
   </section>
@@ -396,21 +390,19 @@ string instead of a char list.</p></li>
   </div>
   
   <section class="docstring">
-    <p>Create an element stream from a xml <code>doc</code>.</p>
-
-<p>This is a lower level API compared to <code>SweetXml.stream_tags</code>. You can use
-the <code>options_callback</code> argument to get fine control of what data to be streamed.</p>
-
+    <p>Create an element stream from a xml <code class="inline">doc</code>.</p>
+<p>This is a lower level API compared to <code class="inline">SweetXml.stream_tags</code>. You can use
+the <code class="inline">options_callback</code> argument to get fine control of what data to be streamed.</p>
 <ul>
-<li><code>doc</code> is an enumerable, data will be pulled during the result stream
-enumeration. e.g. <code>File.stream!(&quot;some_file.xml&quot;)</code></li>
-<li><code>options_callback</code> is an anonymous function <code>fn emit -&gt; xmerl_opts</code> use it to
-define your :xmerl callbacks and put data into the stream using
-<code>emit.(elem)</code> in the callbacks.</li>
+<li><code class="inline">doc</code> is an enumerable, data will be pulled during the result stream
+  enumeration. e.g. <code class="inline">File.stream!(&quot;some_file.xml&quot;)</code>
+</li>
+<li><code class="inline">options_callback</code> is an anonymous function <code class="inline">fn emit -&gt; xmerl_opts</code> use it to
+  define your :xmerl callbacks and put data into the stream using
+  <code class="inline">emit.(elem)</code> in the callbacks.
+</li>
 </ul>
-
-<p>For example, here you define a stream of all <code>xmlElement</code> :</p>
-
+<p>For example, here you define a stream of all <code class="inline">xmlElement</code> :</p>
 <pre><code class="iex elixir">iex&gt; import Record
 iex&gt; doc = [&quot;&lt;h1&quot;, &quot;&gt;&lt;a&gt;Som&quot;, &quot;e linked title&lt;/a&gt;&lt;a&gt;other&lt;/a&gt;&lt;/h1&gt;&quot;]
 iex&gt; SweetXml.stream(doc, fn emit -&gt;
@@ -424,8 +416,7 @@ iex&gt; SweetXml.stream(doc, fn emit -&gt;
 ...&gt;     end
 ...&gt;   ]
 ...&gt; end) |&gt; Enum.count
-3
-</code></pre>
+3</code></pre>
 
   </section>
   
@@ -442,23 +433,22 @@ iex&gt; SweetXml.stream(doc, fn emit -&gt;
   
   <section class="docstring">
     <p>Most common usage of streaming: stream a given tag or a list of tags, and
-optionally &quot;discard&quot; some dom elements in order to free memory during streaming
+optionally “discard” some dom elements in order to free memory during streaming
 for big files which cannot fit entirely in memory.</p>
-
-<p>Note that each matched tag produces it&#39;s own tree. If a given tag appears in
+<p>Note that each matched tag produces it’s own tree. If a given tag appears in
 the discarded options, it is ignored.</p>
-
 <ul>
-<li><code>doc</code> is an enumerable, data will be pulled during the result stream
-enumeration. e.g. <code>File.stream!(&quot;some_file.xml&quot;)</code></li>
-<li><code>tags</code> is an atom or a list of atoms you want to extract. Each stream element
-will be <code>{:tagname, xmlelem}</code>. e.g. :li, :header</li>
-<li><code>options[:discard]</code> is the list of tag which will be discarded:
-not added to its parent DOM.</li>
+<li><code class="inline">doc</code> is an enumerable, data will be pulled during the result stream
+  enumeration. e.g. <code class="inline">File.stream!(&quot;some_file.xml&quot;)</code>
+</li>
+<li><code class="inline">tags</code> is an atom or a list of atoms you want to extract. Each stream element
+  will be <code class="inline">{:tagname, xmlelem}</code>. e.g. :li, :header
+</li>
+<li><code class="inline">options[:discard]</code> is the list of tag which will be discarded:
+   not added to its parent DOM.
+</li>
 </ul>
-
 <p>Examples:</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = [&quot;&lt;ul&gt;&lt;li&gt;l1&lt;/li&gt;&lt;li&gt;l2&quot;, &quot;&lt;/li&gt;&lt;li&gt;l3&lt;/li&gt;&lt;/ul&gt;&quot;]
 iex&gt; SweetXml.stream_tags(doc, :li, discard: [:li])
@@ -468,14 +458,10 @@ iex&gt; SweetXml.stream_tags(doc, :li, discard: [:li])
 iex&gt; SweetXml.stream_tags(doc, [:ul, :li])
 ...&gt; |&gt; Stream.map(fn {_, doc} -&gt; doc |&gt; SweetXml.xpath(~x&quot;./text()&quot;) end)
 ...&gt; |&gt; Enum.to_list
-[&#39;l1&#39;, &#39;l2&#39;, &#39;l3&#39;, nil]
-</code></pre>
-
-<p>Becareful if you set <code>options[:discard]</code>. If any of the discarded tags is nested
+[&#39;l1&#39;, &#39;l2&#39;, &#39;l3&#39;, nil]</code></pre>
+<p>Becareful if you set <code class="inline">options[:discard]</code>. If any of the discarded tags is nested
 inside a kept tag, you will not be able to access them.</p>
-
 <p>Examples:</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = [&quot;&lt;header&gt;&quot;, &quot;&lt;title&gt;XML&lt;/title&quot;, &quot;&gt;&lt;header&gt;&lt;title&gt;Nested&lt;/title&gt;&lt;/header&gt;&lt;/header&gt;&quot;]
 iex&gt; SweetXml.stream_tags(doc, :header)
@@ -485,15 +471,14 @@ iex&gt; SweetXml.stream_tags(doc, :header)
 iex&gt; SweetXml.stream_tags(doc, :header, discard: [:title])
 ...&gt; |&gt; Stream.map(fn {_, doc} -&gt; SweetXml.xpath(doc, ~x&quot;./title/text()&quot;) end)
 ...&gt; |&gt; Enum.to_list
-[nil, nil]
-</code></pre>
+[nil, nil]</code></pre>
 
   </section>
   
 </section>
 <section class="detail">
   <div class="detail_header" id="xmap/2">
-    <span class="signature"><strong>xmap(parent, list2)</strong></span>
+    <span class="signature"><strong>xmap(parent, mapping)</strong></span>
     <div class="detail_header_links">
       <span class="detail_type">(function)</span>
       <a href="#xmap/2" class="detail_link" title="Link to this function">#</a>
@@ -502,31 +487,21 @@ iex&gt; SweetXml.stream_tags(doc, :header, discard: [:title])
   </div>
   
   <section class="docstring">
-    <p><code>xmap</code> returns a mapping with each value being the result of <code>xpath</code></p>
-
-<p>Just as <code>xpath</code>, you can nest the mapping structure. Please see <code>xpath</code> for
+    <p><code class="inline">xmap</code> returns a mapping with each value being the result of <code class="inline">xpath</code></p>
+<p>Just as <code class="inline">xpath</code>, you can nest the mapping structure. Please see <code class="inline">xpath</code> for
 more detail.</p>
-
 <h2>Examples</h2>
-
 <p>Simple</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;h1&gt;&lt;a&gt;Some linked title&lt;/a&gt;&lt;/h1&gt;&quot;
 iex&gt; doc |&gt; xmap(a: ~x&quot;//a/text()&quot;)
-%{a: &#39;Some linked title&#39;}
-</code></pre>
-
+%{a: &#39;Some linked title&#39;}</code></pre>
 <p>With optional mapping</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;body&gt;&lt;header&gt;&lt;p&gt;Message&lt;/p&gt;&lt;ul&gt;&lt;li&gt;One&lt;/li&gt;&lt;li&gt;&lt;a&gt;Two&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/header&gt;&lt;/body&gt;&quot;
 iex&gt; doc |&gt; xmap(message: ~x&quot;//p/text()&quot;, a_in_li: ~x&quot;.//li/a/text()&quot;l)
-%{a_in_li: [&#39;Two&#39;], message: &#39;Message&#39;}
-</code></pre>
-
+%{a_in_li: [&#39;Two&#39;], message: &#39;Message&#39;}</code></pre>
 <p>With optional mapping and nesting</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;body&gt;&lt;header&gt;&lt;p&gt;Message&lt;/p&gt;&lt;ul&gt;&lt;li&gt;One&lt;/li&gt;&lt;li&gt;&lt;a&gt;Two&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/header&gt;&lt;/body&gt;&quot;
 iex&gt; doc
@@ -538,8 +513,40 @@ iex&gt; doc
 ...&gt;      ]
 ...&gt;    )
 %{message: &#39;Message&#39;, ul: %{a: &#39;Two&#39;}}
-</code></pre>
+iex&gt; doc
+...&gt; |&gt; xmap(
+...&gt;      message: ~x&quot;//p/text()&quot;,
+...&gt;      ul: [
+...&gt;        ~x&quot;//ul&quot;k,
+...&gt;        a: ~x&quot;./li/a/text()&quot;
+...&gt;      ]
+...&gt;    )
+%{message: &#39;Message&#39;, ul: [a: &#39;Two&#39;]}
+iex&gt; doc
+...&gt; |&gt; xmap([
+...&gt;      message: ~x&quot;//p/text()&quot;,
+...&gt;      ul: [
+...&gt;        ~x&quot;//ul&quot;,
+...&gt;        a: ~x&quot;./li/a/text()&quot;
+...&gt;      ]
+...&gt;    ], true)
+[message: &#39;Message&#39;, ul: %{a: &#39;Two&#39;}]</code></pre>
 
+  </section>
+  
+</section>
+<section class="detail">
+  <div class="detail_header" id="xmap/3">
+    <span class="signature"><strong>xmap(parent, arg2, atom)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#xmap/3" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <section class="docstring">
+    
   </section>
   
 </section>
@@ -554,34 +561,24 @@ iex&gt; doc
   </div>
   
   <section class="docstring">
-    <p><code>xpath</code> allows you to query an xml document with xpath.</p>
-
-<p>The second argument to xpath is a <a href="SweetXpath.html"><code>SweetXpath</code></a> struct. The optional third
+    <p><code class="inline">xpath</code> allows you to query an xml document with xpath.</p>
+<p>The second argument to xpath is a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> struct. The optional third
 argument is a keyword list, such that the value of each keyword is also
-either a <a href="SweetXpath.html"><code>SweetXpath</code></a> or a list with head being a <a href="SweetXpath.html"><code>SweetXpath</code></a> and tail being
+either a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> or a list with head being a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> and tail being
 another keyword list exactly like before. Please see examples below for better
 understanding.</p>
-
 <h2>Examples</h2>
-
 <p>Simple</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;h1&gt;&lt;a&gt;Some linked title&lt;/a&gt;&lt;/h1&gt;&quot;
 iex&gt; doc |&gt; xpath(~x&quot;//a/text()&quot;)
-&#39;Some linked title&#39;
-</code></pre>
-
+&#39;Some linked title&#39;</code></pre>
 <p>With optional mapping</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;body&gt;&lt;header&gt;&lt;p&gt;Message&lt;/p&gt;&lt;ul&gt;&lt;li&gt;One&lt;/li&gt;&lt;li&gt;&lt;a&gt;Two&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/header&gt;&lt;/body&gt;&quot;
 iex&gt; doc |&gt; xpath(~x&quot;//header&quot;, message: ~x&quot;./p/text()&quot;, a_in_li: ~x&quot;.//li/a/text()&quot;l)
-%{a_in_li: [&#39;Two&#39;], message: &#39;Message&#39;}
-</code></pre>
-
+%{a_in_li: [&#39;Two&#39;], message: &#39;Message&#39;}</code></pre>
 <p>With optional mapping and nesting</p>
-
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;body&gt;&lt;header&gt;&lt;p&gt;Message&lt;/p&gt;&lt;ul&gt;&lt;li&gt;One&lt;/li&gt;&lt;li&gt;&lt;a&gt;Two&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/header&gt;&lt;/body&gt;&quot;
 iex&gt; doc
@@ -592,8 +589,7 @@ iex&gt; doc
 ...&gt;        a: ~x&quot;./li/a/text()&quot;
 ...&gt;      ]
 ...&gt;    )
-%{ul: %{a: &#39;Two&#39;}}
-</code></pre>
+%{ul: %{a: &#39;Two&#39;}}</code></pre>
 
   </section>
   
