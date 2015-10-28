@@ -21,7 +21,7 @@ defmodule SweetXml.Mixfile do
   end
 
   def application do
-    []
+    [applications: [:xmerl]]
   end
 
   defp deps do
