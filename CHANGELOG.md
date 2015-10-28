@@ -1,5 +1,17 @@
 ## Changelog
 
+## 0.5.0
+
+* Added support to optional modifier
+* Update elixir requirement
+* Map refactoring, from if/else tree to cleaner pattern matching
+* Add casting capabilities
+* Fix dependencies : doc deps only for :dev and otp "xmerl" dependency 
+
+## 0.4.0
+
+* Added support to map into keyword list instead of maps
+
 ## 0.3.0
 
 * Added support to return values as strings (viniciussbs)
