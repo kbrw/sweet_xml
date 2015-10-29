@@ -401,6 +401,13 @@ defmodule SweetXml do
     get_current_entities(parent, spec)
   end
 
+  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: :string} = spec) do
+    spec = %SweetXpath{spec | is_list: true}
+    get_current_entities(parent, spec)
+    |> Enum.map(&(_value(&1) |> to_cast(:string)))
+    |> Enum.join
+  end
+
   def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: cast} = spec) do
     get_current_entities(parent, spec) |> _value |> to_cast(cast)
   end
