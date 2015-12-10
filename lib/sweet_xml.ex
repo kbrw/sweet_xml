@@ -394,7 +394,7 @@ defmodule SweetXml do
   end
 
   def xpath(parent, %SweetXpath{is_list: true, is_value: true, cast_to: cast} = spec) do
-    get_current_entities(parent, spec) |> Enum.map &(_value(&1) |> to_cast(cast))
+    get_current_entities(parent, spec) |> Enum.map(&(_value(&1)) |> to_cast(cast))
   end
 
   def xpath(parent, %SweetXpath{is_list: true, is_value: false} = spec) do

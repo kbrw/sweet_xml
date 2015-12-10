@@ -39,30 +39,30 @@ defmodule SweetXmlTest do
   end
 
   test "xpath with sweet_xpath as only argment", %{simple: doc} do
-    result = doc |> xpath ~x"//header/text()"e
+    result = doc |> xpath(~x"//header/text()"e)
     assert xmlText(result, :value) == 'Content Header'
 
-    result = doc |> xpath ~x"//header/text()"
+    result = doc |> xpath(~x"//header/text()")
     assert result == 'Content Header'
 
-    result = doc |> xpath ~x"//header/text()"s
+    result = doc |> xpath(~x"//header/text()"s)
     assert result == "Content Header"
 
-    result = doc |> xpath ~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"l
+    result = doc |> xpath(~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"l)
     assert result == ['One', 'Two', 'Three', 'Four', 'Five']
 
-    result = doc |> xpath ~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"ls
+    result = doc |> xpath(~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"ls)
     assert result == ["One", "Two", "Three", "Four", "Five"]
 
-    result = doc |> xpath ~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"le
+    result = doc |> xpath(~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"le)
     assert length(result) == 5
     assert result |> List.first |> xmlText(:value) == 'One'
   end
 
   test "xpath should return values for those entities that have values", %{simple: doc} do
-    result = doc |> xpath ~x"//li/@class"
+    result = doc |> xpath(~x"//li/@class")
     assert result == 'first star'
-    result = doc |> xpath ~x"//li/@data-index"
+    result = doc |> xpath(~x"//li/@data-index")
     assert result == '1'
   end
 
@@ -183,7 +183,7 @@ defmodule SweetXmlTest do
   test "reuse returned nodes", %{simple: doc} do
     result = doc
     |> xpath(~x"//li"l)
-    |> Enum.map &(&1 |> xpath(~x"./text()"))
+    |> Enum.map(&(&1 |> xpath(~x"./text()")))
     assert result == ['First', 'Second', 'Third', 'Forth']
   end
 
@@ -273,7 +273,7 @@ defmodule SweetXmlTest do
         key: ~x"./team_key/text()"
       ]
     )
-    |> Enum.reduce %{}, fn(matchup, stat) ->
+    |> Enum.reduce(%{}, fn(matchup, stat) ->
       winner_name = matchup[:winner][:name]
       loser_name = matchup[:loser][:name]
       stat = Map.put_new(stat, winner_name, %{wins: 0, loses: 0})
@@ -283,7 +283,7 @@ defmodule SweetXmlTest do
       {_, stat} = get_and_update_in(stat, [loser_name, :loses], &{&1, &1 + 1})
 
       stat
-    end
+    end)
 
     assert result == %{
       'Asgardian Warlords' => %{loses: 0, wins: 1},
