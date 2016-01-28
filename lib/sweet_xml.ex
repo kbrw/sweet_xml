@@ -166,6 +166,11 @@ defmodule SweetXml do
       'i' stands for (i)nteger. This forces `xpath/2` to return the value as
       integer instead of a char list.
 
+    * `~x"//some/path"f`
+
+      'f' stands for (f)loat. This forces `xpath/2` to return the value as
+      float instead of a char list.
+
     * `~x"//some/path"il` - integer list
   """
   def sigil_x(path, modifiers \\ '') do
@@ -178,6 +183,7 @@ defmodule SweetXml do
       cast_to: cond do
         ?s in modifiers -> :string
         ?i in modifiers -> :integer
+        ?f in modifiers -> :float
         :otherwise -> false
       end
     }
@@ -601,5 +607,6 @@ defmodule SweetXml do
   defp to_cast(value, false), do: value
   defp to_cast(value, :string), do: to_string(value)
   defp to_cast(value, :integer), do: String.to_integer(to_string(value))
+  defp to_cast(value, :float), do: String.to_float(to_string(value))
 
 end
