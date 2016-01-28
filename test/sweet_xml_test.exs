@@ -30,6 +30,7 @@ defmodule SweetXmlTest do
     assert ~x"//header/text()"k == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: true, cast_to: false}
     assert ~x"//header/text()"s == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :string}
     assert ~x"//header/text()"i == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :integer}
+    assert ~x"//header/text()"f == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :float}
     assert ~x"//header/text()"el == %SweetXpath{path: '//header/text()', is_value: false, is_list: true, is_keyword: false, cast_to: false}
     assert ~x"//header/text()"le == %SweetXpath{path: '//header/text()', is_value: false, is_list: true, is_keyword: false, cast_to: false}
     assert ~x"//header/text()"sl == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: :string}
@@ -411,5 +412,6 @@ defmodule SweetXmlTest do
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()])  == '239541'
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()]s) == "239541"
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()]i) ==  239541
+    assert xpath(doc, ~x[//total/text()]f) ==  204.68
   end
 end
