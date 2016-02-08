@@ -414,4 +414,8 @@ defmodule SweetXmlTest do
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()]i) ==  239541
     assert xpath(doc, ~x[//total/text()]f) ==  204.68
   end
+
+  test "xml entities do not split strings" do
+    assert xpath("<foo>hello&amp;world</foo>", ~x[/foo/text()]s) == "hello&world"
+  end
 end
