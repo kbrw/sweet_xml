@@ -4,7 +4,7 @@ defmodule SweetXml.Mixfile do
   def project do
     [
       app: :sweet_xml,
-      version: "0.5.1",
+      version: "0.6.0",
       elixir: "~> 1.0",
       deps: deps,
       package: [

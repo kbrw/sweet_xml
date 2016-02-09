@@ -1,5 +1,11 @@
 ## Changelog
 
+## 0.6.0
+
+* text() xml nodes are now joined with the `s` modifier
+* `transform_by` function allows you to customize each mapped field
+  with any function
+
 ## 0.5.0
 
 * Added support to optional modifier
