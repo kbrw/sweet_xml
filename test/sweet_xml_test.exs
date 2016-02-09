@@ -418,4 +418,32 @@ defmodule SweetXmlTest do
   test "xml entities do not split strings" do
     assert xpath("<foo>hello&amp;world</foo>", ~x[/foo/text()]s) == "hello&world"
   end
+
+  test "transform_by", %{complex: doc} do
+    date_string_to_iso_week = fn str ->
+      {_year, week} =
+        str
+        |> String.split("-", trim: true)
+        |> Enum.map(&String.to_integer/1)
+        |> List.to_tuple |> :calendar.iso_week_number
+      week
+    end
+
+    parse_scoreboard = fn xpath_node ->
+      xpath_node
+      |> xmap(
+        week: ~x"./week/text()"i,
+        matchups: ~x"./matchups/@count"i
+      )
+    end
+
+    result = doc
+    |> xpath(
+      ~x"//fantasy_content/league",
+      iso_week: ~x"./start_date/text()"s |> transform_by(date_string_to_iso_week),
+      scoreboard: ~x"./scoreboard" |> transform_by(parse_scoreboard),
+    )
+
+    assert result == %{iso_week: 36, scoreboard: %{week: 16, matchups: 4}}
+  end
 end
