@@ -246,6 +246,49 @@ doc
 )
 ```
 
+### Transform By
+
+Sometimes we need to transform the value to what we need, SweetXml supports that
+via `transform_by/2`
+
+```elixir
+doc = "<li><name><first>john</first><last>doe</last></name><age>30</age></li>"
+
+result = doc |> xpath(
+  ~x"//li"l,
+  name: [
+    ~x"./name",
+    first: ~x"./first/text()"s |> transform_by(&String.capitalize/1),
+    last: ~x"./last/text()"s |> transform_by(&String.capitalize/1)
+  ],
+  age: ~x"./age/text()"i
+)
+
+^result = [%{age: 30, name: %{first: "John", last: "Doe"}}]
+```
+
+The same can be used to break parsing code into reusable functions that can be
+used in nesting
+
+```elixir
+doc = "<li><name><first>john</first><last>doe</last></name><age>30</age></li>"
+
+parse_name = fn xpath_node ->
+  xpath_node |> xmap(
+    first: ~x"./first/text()"s |> transform_by(&String.capitalize/1),
+    last: ~x"./last/text()"s |> transform_by(&String.capitalize/1)
+  )
+end
+
+result = doc |> xpath(
+  ~x"//li"l,
+  name: ~x"./name" |> transform_by(parse_name),
+  age: ~x"./age/text()"i
+)
+
+^result = [%{age: 30, name: %{first: "John", last: "Doe"}}]
+```
+
 For more examples, please take a look at the tests and help.
 
 ## Streaming

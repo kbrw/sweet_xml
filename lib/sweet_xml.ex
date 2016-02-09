@@ -1,5 +1,12 @@
 defmodule SweetXpath do
-  defstruct path: ".", is_value: true, is_list: false, is_keyword: false, is_optional: false, cast_to: false
+
+  defmodule Priv do
+    @moduledoc false
+    @doc false
+    def self_val(val), do: val
+  end
+
+  defstruct path: ".", is_value: true, is_list: false, is_keyword: false, is_optional: false, cast_to: false, transform_fun: &Priv.self_val/1
 end
 
 defmodule SweetXml do
@@ -400,11 +407,11 @@ defmodule SweetXml do
   end
 
   def xpath(parent, %SweetXpath{is_list: true, is_value: true, cast_to: cast} = spec) do
-    get_current_entities(parent, spec) |> Enum.map(&(_value(&1)) |> to_cast(cast))
+    get_current_entities(parent, spec) |> Enum.map(&(_value(&1)) |> to_cast(cast)) |> spec.transform_fun.()
   end
 
   def xpath(parent, %SweetXpath{is_list: true, is_value: false} = spec) do
-    get_current_entities(parent, spec)
+    get_current_entities(parent, spec) |> spec.transform_fun.()
   end
 
   def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: :string} = spec) do
@@ -412,14 +419,15 @@ defmodule SweetXml do
     get_current_entities(parent, spec)
     |> Enum.map(&(_value(&1) |> to_cast(:string)))
     |> Enum.join
+    |> spec.transform_fun.()
   end
 
   def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: cast} = spec) do
-    get_current_entities(parent, spec) |> _value |> to_cast(cast)
+    get_current_entities(parent, spec) |> _value |> to_cast(cast) |> spec.transform_fun.()
   end
 
   def xpath(parent, %SweetXpath{is_list: false, is_value: false} = spec) do
-    get_current_entities(parent, spec)
+    get_current_entities(parent, spec) |> spec.transform_fun.()
   end
 
 
@@ -506,6 +514,29 @@ defmodule SweetXml do
   def xmap(parent, [{label, sweet_xpath} | tail], is_keyword) do
     result = xmap(parent, tail, is_keyword)
     Dict.put result, label, xpath(parent, sweet_xpath)
+  end
+
+  @doc """
+  Tags `%SweetXpath{}` with `fun` to be applied at the end of `xpath` query.
+
+  ## Examples
+
+    iex> import SweetXml
+    iex> string_to_range = fn str ->
+    ...>     [first, last] = str |> String.split("-", trim: true) |> Enum.map(&String.to_integer/1)
+    ...>     first..last
+    ...>   end
+    iex> doc = "<weather><zone><name>north</name><wind-speed>5-15</wind-speed></zone></weather>"
+    iex> doc
+    ...> |> xpath(
+    ...>      ~x"//weather/zone"l,
+    ...>      name: ~x"//name/text()"s |> transform_by(&String.capitalize/1),
+    ...>      wind_speed: ~x"./wind-speed/text()"s |> transform_by(string_to_range)
+    ...>    )
+    [%{name: "North", wind_speed: 5..15}]
+  """
+  def transform_by(%SweetXpath{}=sweet_xpath, fun) when is_function(fun) do
+    %{sweet_xpath | transform_fun: fun}
   end
 
   defp _value(entity) do
