@@ -417,6 +417,7 @@ defmodule SweetXmlTest do
 
   test "xml entities do not split strings" do
     assert xpath("<foo>hello&amp;world</foo>", ~x[/foo/text()]s) == "hello&world"
+    assert xpath("<foo>hello&amp;world</foo>", ~x"name(.)"s) == "foo"
   end
 
   test "transform_by", %{complex: doc} do

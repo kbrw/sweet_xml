@@ -630,7 +630,7 @@ defmodule SweetXml do
   end
 
   defp get_current_entities(parent, %SweetXpath{path: path, is_list: true}) do
-    :xmerl_xpath.string(path, parent)
+    :xmerl_xpath.string(path, parent) |> List.wrap
   end
 
   defp get_current_entities(parent, %SweetXpath{path: path, is_list: false}) do
