@@ -1,5 +1,9 @@
 ## Changelog
 
+## 0.6.1
+
+* bugfix: xpath `list` modifier should always return a list
+
 ## 0.6.0
 
 * text() xml nodes are now joined with the `s` modifier
