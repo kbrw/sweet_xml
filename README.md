@@ -181,6 +181,11 @@ is being returned.
 
     'i' stands for (i)nteger. This forces `xpath/2` to return the value as
     integer instead of a char list.
+    
+  * `~x"//some/path"f`
+
+    'f' stands for (f)loat. This forces `xpath/2` to return the value as
+    float instead of a char list.
 
   * `~x"//some/path"il` - integer list.
 
