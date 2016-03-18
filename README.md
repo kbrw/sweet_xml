@@ -4,7 +4,7 @@
 
 `SweetXml` is a thin wrapper around `:xmerl`. It allows you to convert a
 `char_list` or `xmlElement` record as defined in `:xmerl` to an elixir value such
-as `map`, `list`, `string`, `integer`, or any combination of these.
+as `map`, `list`, `string`, `integer`, `float` or any combination of these.
 
 
 ## Examples
