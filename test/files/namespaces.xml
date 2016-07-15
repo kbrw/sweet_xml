@@ -1,0 +1,6 @@
+<?xml version="1.05" encoding="UTF-8"?>
+<thing xmlns="http://example.com/thing" xmlns:ns1="http://example.com/special">
+  <id>42</id>
+  <size>large</size>
+  <ns1:delivery_type>courier</ns1:delivery_type>
+</thing>

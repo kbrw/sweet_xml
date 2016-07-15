@@ -199,6 +199,68 @@ assert ~x"//some/path"e == %SweetXpath{path: '//some/path', is_value: false, is_
 
 Note the use of char_list in the path definition.
 
+## Namespace support
+
+Given a xml document such as below
+
+```xml
+<?xml version="1.05" encoding="UTF-8"?>
+<game xmlns="http://example.com/fantasy-league" xmlns:ns1="http://example.com/baseball-stats">
+  <matchups>
+    <matchup winner-id="1">
+      <name>Match One</name>
+      <teams>
+        <team>
+          <id>1</id>
+          <name>Team One</name>
+          <ns1:runs>5</ns1:runs>
+        </team>
+        <team>
+          <id>2</id>
+          <name>Team Two</name>
+          <ns1:runs>2</ns1:runs>
+        </team>
+      </teams>
+    </matchup>
+  </matchups>
+</game>
+```
+
+We can do the following
+
+```elixir
+import SweetXml
+xml_str = "..." # as above
+doc = parse(xml_str, namespace_conformant: true)
+```
+
+Note the fact that we explicitly parse the XML with the `namespace_conformant:
+true` option. This is needed to allow nodes to be identified in a prefix
+independent way.
+
+We can use namespace prefixes of our preference, regardless of what prefix is
+used in the document:
+
+```elixir
+result = doc
+  |> xpath(~x"//ff:matchup/ff:name/text()"
+           |> add_namespace("ff", "http://example.com/fantasy-league"))
+
+assert result == 'Match One'
+```
+
+We can specify multiple namespace prefixes: 
+
+```elixir
+result = doc
+  |> xpath(~x"//ff:matchup//bb:runs/text()"
+           |> add_namespace("ff", "http://example.com/fantasy-league")
+           |> add_namespace("bb", "http://example.com/baseball-stats"))
+
+assert result == '5'
+```
+
+
 ## From Chaining to Nesting
 
 Here's a brief explanation to how nesting came about.

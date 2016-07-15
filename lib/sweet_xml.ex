@@ -6,7 +6,14 @@ defmodule SweetXpath do
     def self_val(val), do: val
   end
 
-  defstruct path: ".", is_value: true, is_list: false, is_keyword: false, is_optional: false, cast_to: false, transform_fun: &Priv.self_val/1
+  defstruct path: ".",
+    is_value: true,
+    is_list: false,
+    is_keyword: false,
+    is_optional: false,
+    cast_to: false,
+    transform_fun: &(Priv.self_val/1),
+    namespaces: []
 end
 
 defmodule SweetXml do
@@ -196,7 +203,12 @@ defmodule SweetXml do
     }
   end
 
-  @doc """
+  def add_namespace(xpath, prefix, uri) do
+    %SweetXpath{xpath | namespaces: [{to_char_list(prefix), to_char_list(uri)}
+                                     | xpath.namespaces]}
+  end
+
+@doc """
   `doc` can be
 
   - a byte list (iodata)
@@ -629,12 +641,12 @@ defmodule SweetXml do
     end
   end
 
-  defp get_current_entities(parent, %SweetXpath{path: path, is_list: true}) do
-    :xmerl_xpath.string(path, parent) |> List.wrap
+  defp get_current_entities(parent, %SweetXpath{path: path, is_list: true, namespaces: namespaces}) do
+    :xmerl_xpath.string(path, parent, [namespace: namespaces]) |> List.wrap
   end
 
-  defp get_current_entities(parent, %SweetXpath{path: path, is_list: false}) do
-    ret = :xmerl_xpath.string(path, parent)
+  defp get_current_entities(parent, %SweetXpath{path: path, is_list: false, namespaces: namespaces}) do
+    ret = :xmerl_xpath.string(path, parent, [namespace: namespaces])
     if is_record?(ret, :xmlObj) do
       ret
     else
