@@ -508,12 +508,12 @@ defmodule SweetXml do
   def xmap(parent, [{label, spec} | tail], is_keyword) when is_list(spec) do
     [sweet_xpath | subspec] = spec
     result = xmap(parent, tail, is_keyword)
-    Dict.put result, label, xpath(parent, sweet_xpath, subspec)
+    put_in result[label], xpath(parent, sweet_xpath, subspec)
   end
 
   def xmap(parent, [{label, sweet_xpath} | tail], is_keyword) do
     result = xmap(parent, tail, is_keyword)
-    Dict.put result, label, xpath(parent, sweet_xpath)
+    put_in result[label], xpath(parent, sweet_xpath)
   end
 
   @doc """
