@@ -341,7 +341,7 @@ defmodule SweetXml do
   end
   def stream(doc, options_callback) do
     Stream.resource fn ->
-      {parent, ref} = waiter = {self, make_ref}
+      {parent, ref} = waiter = {self(), make_ref()}
       opts = options_callback.(fn e -> send(parent, {:event, ref, e}) end)
       pid = spawn fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
       {ref, pid, Process.monitor(pid)}

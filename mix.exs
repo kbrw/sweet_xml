@@ -6,7 +6,7 @@ defmodule SweetXml.Mixfile do
       app: :sweet_xml,
       version: "0.6.1",
       elixir: "~> 1.0",
-      deps: deps,
+      deps: deps(),
       package: [
         maintainers: ["Frank Liu", "Arnaud Wetzel", "Tomáš Brukner", "Vinícius Sales", "Sean Tan"],
         licenses: ["MIT"],
