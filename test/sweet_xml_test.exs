@@ -10,7 +10,13 @@ defmodule SweetXmlTest do
     complex_stream = File.stream!("./test/files/complex.xml")
     simple_stream = File.stream!("./test/files/simple_stream.xml")
     readme = File.read!("test/files/readme.xml")
-    {:ok, [simple: simple, complex: complex, readme: readme, complex_stream: complex_stream, simple_stream: simple_stream]}
+    namespaces = File.read!("test/files/namespaces.xml")
+    {:ok, [simple: simple,
+           complex: complex,
+           readme: readme,
+           complex_stream: complex_stream,
+           simple_stream: simple_stream,
+           namespaces: namespaces]}
   end
 
   test "parse", %{simple: doc} do
@@ -446,5 +452,20 @@ defmodule SweetXmlTest do
     )
 
     assert result == %{iso_week: 36, scoreboard: %{week: 16, matchups: 4}}
+  end
+
+  test "namespace support: same prefix as in document", %{namespaces: doc} do
+    result = doc |> xpath(~x"//ns1:delivery_type/text()"s)
+    assert result == "courier"
+  end
+
+  test "namespace support: alternate prefixes", %{namespaces: doc} do
+    result =
+      parse(doc, namespace_conformant: true)
+      |> xpath(~x"/t:thing/s:delivery_type/text()"s
+               |> add_namespace("s", "http://example.com/special")
+               |> add_namespace("t", "http://example.com/thing"))
+
+    assert result == "courier"
   end
 end
