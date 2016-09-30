@@ -4,7 +4,7 @@
 
 `SweetXml` is a thin wrapper around `:xmerl`. It allows you to convert a
 `char_list` or `xmlElement` record as defined in `:xmerl` to an elixir value such
-as `map`, `list`, `string`, `integer`, `float` or any combination of these.
+as `map`, `list`, `string`, `integer`, `float`, `boolean` or any combination of these.
 
 
 ## Examples
@@ -181,13 +181,18 @@ is being returned.
 
     'i' stands for (i)nteger. This forces `xpath/2` to return the value as
     integer instead of a char list.
-    
+
+  * `~x"//some/path"il` - integer list.
+
   * `~x"//some/path"f`
 
     'f' stands for (f)loat. This forces `xpath/2` to return the value as
     float instead of a char list.
 
-  * `~x"//some/path"il` - integer list.
+  * `~x"//some/path"b`
+
+    'b' stands for (b)oolean. This forces `xpath/2` to return the value as
+    boolean instead of the char lists `'true'` and `'false'`.
 
 Also in the examples section, we always import SweetXml first. This
 makes `x_sigil` available in the current scope. Without it, instead of using
@@ -249,7 +254,7 @@ result = doc
 assert result == 'Match One'
 ```
 
-We can specify multiple namespace prefixes: 
+We can specify multiple namespace prefixes:
 
 ```elixir
 result = doc
