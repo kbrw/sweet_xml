@@ -30,19 +30,22 @@ defmodule SweetXmlTest do
   end
 
   test "xpath sigil" do
-    assert ~x"//header/text()" == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: false}
-    assert ~x"//header/text()"e == %SweetXpath{path: '//header/text()', is_value: false, is_list: false, is_keyword: false, cast_to: false}
-    assert ~x"//header/text()"l == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: false}
-    assert ~x"//header/text()"k == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: true, cast_to: false}
-    assert ~x"//header/text()"s == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :string}
-    assert ~x"//header/text()"i == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :integer}
-    assert ~x"//header/text()"f == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :float}
+    assert ~x"//header/text()"   == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: false}
+    assert ~x"//header/text()"e  == %SweetXpath{path: '//header/text()', is_value: false, is_list: false, is_keyword: false, cast_to: false}
+    assert ~x"//header/text()"l  == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: false}
+    assert ~x"//header/text()"k  == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: true, cast_to: false}
+    assert ~x"//header/text()"s  == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :string}
+    assert ~x"//header/text()"i  == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :integer}
+    assert ~x"//header/text()"f  == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :float}
     assert ~x"//header/text()"el == %SweetXpath{path: '//header/text()', is_value: false, is_list: true, is_keyword: false, cast_to: false}
     assert ~x"//header/text()"le == %SweetXpath{path: '//header/text()', is_value: false, is_list: true, is_keyword: false, cast_to: false}
     assert ~x"//header/text()"sl == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: :string}
     assert ~x"//header/text()"ls == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: :string}
     assert ~x"//header/text()"il == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: :integer}
     assert ~x"//header/text()"li == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: :integer}
+    assert ~x"//header/text()"b  == %SweetXpath{path: '//header/text()', is_value: true, is_list: false, is_keyword: false, cast_to: :boolean}
+    assert ~x"//header/text()"bl == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: :boolean}
+    assert ~x"//header/text()"lb == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: :boolean}
   end
 
   test "xpath with sweet_xpath as only argment", %{simple: doc} do
@@ -418,7 +421,8 @@ defmodule SweetXmlTest do
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()])  == '239541'
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()]s) == "239541"
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()]i) ==  239541
-    assert xpath(doc, ~x[//total/text()]f) ==  204.68
+    assert xpath(doc, ~x[//total/text()]f) == 204.68
+    assert xpath(doc, ~x[//active/text()]b) == true
   end
 
   test "xml entities do not split strings" do
