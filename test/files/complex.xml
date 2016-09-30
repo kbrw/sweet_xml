@@ -7,6 +7,7 @@
     <url>http://football.fantasysports.yahoo.com/archive/nfl/2012/239541</url>
     <draft_status>postdraft</draft_status>
     <num_teams>10</num_teams>
+    <active>true</active>
     <edit_key>17</edit_key>
     <weekly_deadline/>
     <league_update_timestamp>1357339553</league_update_timestamp>

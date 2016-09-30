@@ -198,6 +198,7 @@ defmodule SweetXml do
         ?s in modifiers -> :string
         ?i in modifiers -> :integer
         ?f in modifiers -> :float
+        ?b in modifiers -> :boolean
         :otherwise -> false
       end
     }
@@ -658,5 +659,7 @@ defmodule SweetXml do
   defp to_cast(value, :string), do: to_string(value)
   defp to_cast(value, :integer), do: String.to_integer(to_string(value))
   defp to_cast(value, :float), do: String.to_float(to_string(value))
+  defp to_cast('true', :boolean), do: true
+  defp to_cast('false', :boolean), do: false
 
 end
