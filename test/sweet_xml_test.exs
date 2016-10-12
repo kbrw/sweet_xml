@@ -11,13 +11,13 @@ defmodule SweetXmlTest do
     simple_stream = File.stream!("./test/files/simple_stream.xml")
     readme = File.read!("test/files/readme.xml")
     namespaces = File.read!("test/files/namespaces.xml")
-    float = File.read!("test/files/float.xml")
+    float_sigil = File.read!("test/files/float.xml")
     {:ok, [simple: simple,
            complex: complex,
            readme: readme,
            complex_stream: complex_stream,
            simple_stream: simple_stream,
-           namespaces: namespaces, float: float]}
+           namespaces: namespaces, float_sigil: float_sigil]}
   end
 
   test "parse", %{simple: doc} do
@@ -470,7 +470,7 @@ defmodule SweetXmlTest do
     assert result == "courier"
   end
 
-  test "float sigil with integer and zero", %{float: doc} do
+  test "float sigil with integer and zero", %{float_sigil: doc} do
     assert doc |> xpath(~x"//product[@id=\"float\"]/price/text()"f)   == 1.4
     assert doc |> xpath(~x"//product[@id=\"integer\"]/price/text()"f) == 3.0
     assert doc |> xpath(~x"//product[@id=\"zero\"]/price/text()"f)    == 0.0
