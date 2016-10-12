@@ -470,7 +470,7 @@ defmodule SweetXmlTest do
     assert result == "courier"
   end
 
-  test "f sigil with integer and zero", %{float_sigil: doc} do
+  test "float sigil with integer and zero", %{float_sigil: doc} do
     assert doc |> xpath(~x"//product[@id=\"float\"]/price/text()"f)   == 1.4
     assert doc |> xpath(~x"//product[@id=\"integer\"]/price/text()"f) == 3.0
     assert doc |> xpath(~x"//product[@id=\"zero\"]/price/text()"f)    == 0.0
