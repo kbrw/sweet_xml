@@ -657,6 +657,9 @@ defmodule SweetXml do
   defp to_cast(value, false), do: value
   defp to_cast(value, :string), do: to_string(value)
   defp to_cast(value, :integer), do: String.to_integer(to_string(value))
-  defp to_cast(value, :float), do: String.to_float(to_string(value))
+  defp to_cast(value, :float) do
+   {float,_} = Float.parse(to_string(value))
+   float
+  end
 
 end

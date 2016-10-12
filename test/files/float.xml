@@ -1,0 +1,17 @@
+<?xml version="1.05" encoding="UTF-8"?>
+<order>
+  <products>
+    <product id="float">
+      <name>Product float</name>
+      <price>1.4</price>
+    </product>
+    <product id="integer">
+      <name>Product integer</name>
+      <price>3</price>
+    </product>
+    <product id="zero">
+      <name>Product with 0</name>
+      <price>0</price>
+    </product>
+  </products>
+</order>
