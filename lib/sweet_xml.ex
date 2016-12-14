@@ -418,24 +418,24 @@ defmodule SweetXml do
     parent |> parse |> xpath(spec)
   end
 
-  def xpath(parent, %SweetXpath{is_list: true, is_value: true, cast_to: cast} = spec) do
-    get_current_entities(parent, spec) |> Enum.map(&(_value(&1)) |> to_cast(cast)) |> spec.transform_fun.()
+  def xpath(parent, %SweetXpath{is_list: true, is_value: true, cast_to: cast, is_optional: is_opt?} = spec) do
+    get_current_entities(parent, spec) |> Enum.map(&(_value(&1)) |> to_cast(cast,is_opt?)) |> spec.transform_fun.()
   end
 
   def xpath(parent, %SweetXpath{is_list: true, is_value: false} = spec) do
     get_current_entities(parent, spec) |> spec.transform_fun.()
   end
 
-  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: :string} = spec) do
+  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: :string, is_optional: is_opt?} = spec) do
     spec = %SweetXpath{spec | is_list: true}
     get_current_entities(parent, spec)
-    |> Enum.map(&(_value(&1) |> to_cast(:string)))
+    |> Enum.map(&(_value(&1) |> to_cast(:string, is_opt?)))
     |> Enum.join
     |> spec.transform_fun.()
   end
 
-  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: cast} = spec) do
-    get_current_entities(parent, spec) |> _value |> to_cast(cast) |> spec.transform_fun.()
+  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: cast, is_optional: is_opt?} = spec) do
+    get_current_entities(parent, spec) |> _value |> to_cast(cast, is_opt?) |> spec.transform_fun.()
   end
 
   def xpath(parent, %SweetXpath{is_list: false, is_value: false} = spec) do
@@ -654,10 +654,11 @@ defmodule SweetXml do
     end
   end
 
-  defp to_cast(value, false), do: value
-  defp to_cast(value, :string), do: to_string(value)
-  defp to_cast(value, :integer), do: String.to_integer(to_string(value))
-  defp to_cast(value, :float) do
+  defp to_cast(value, false, _is_opt?), do: value
+  defp to_cast(nil, _, true), do: nil
+  defp to_cast(value, :string, _is_opt?), do: to_string(value)
+  defp to_cast(value, :integer, _is_opt?), do: String.to_integer(to_string(value))
+  defp to_cast(value, :float, _is_opt?) do
    {float,_} = Float.parse(to_string(value))
    float
   end
