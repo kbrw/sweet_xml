@@ -196,8 +196,11 @@ defmodule SweetXml do
       is_optional: ?o in modifiers,
       cast_to: cond do
         ?s in modifiers -> :string
+        ?S in modifiers -> :soft_string
         ?i in modifiers -> :integer
+        ?I in modifiers -> :soft_integer
         ?f in modifiers -> :float
+        ?F in modifiers -> :soft_float
         :otherwise -> false
       end
     }
@@ -426,10 +429,10 @@ defmodule SweetXml do
     get_current_entities(parent, spec) |> spec.transform_fun.()
   end
 
-  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: :string, is_optional: is_opt?} = spec) do
+  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: string_type, is_optional: is_opt?} = spec) when string_type in [:string,:soft_string] do
     spec = %SweetXpath{spec | is_list: true}
     get_current_entities(parent, spec)
-    |> Enum.map(&(_value(&1) |> to_cast(:string, is_opt?)))
+    |> Enum.map(&(_value(&1) |> to_cast(string_type, is_opt?)))
     |> Enum.join
     |> spec.transform_fun.()
   end
@@ -662,5 +665,31 @@ defmodule SweetXml do
    {float,_} = Float.parse(to_string(value))
    float
   end
-
+  defp to_cast(value, :soft_string, _is_opt?) do
+    if String.Chars.impl_for(value) do
+      to_string(value)
+    else
+      ""
+    end
+  end
+  defp to_cast(value, :soft_integer, _is_opt?) do
+    if String.Chars.impl_for(value) do
+      case Integer.parse(to_string(value)) do
+        :error-> 0
+        {int,_}-> int
+      end
+    else
+      0
+    end
+  end
+  defp to_cast(value, :soft_float, _is_opt?) do
+    if String.Chars.impl_for(value) do
+      case Float.parse(to_string(value)) do
+        :error-> 0.0
+        {float,_}->float
+      end
+    else
+      0.0
+    end
+  end
 end
