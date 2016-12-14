@@ -665,31 +665,31 @@ defmodule SweetXml do
    {float,_} = Float.parse(to_string(value))
    float
   end
-  defp to_cast(value, :soft_string, _is_opt?) do
+  defp to_cast(value, :soft_string, is_opt?) do
     if String.Chars.impl_for(value) do
       to_string(value)
     else
-      ""
+      if is_opt?, do: nil, else: ""
     end
   end
-  defp to_cast(value, :soft_integer, _is_opt?) do
+  defp to_cast(value, :soft_integer, is_opt?) do
     if String.Chars.impl_for(value) do
       case Integer.parse(to_string(value)) do
-        :error-> 0
+        :error-> if is_opt?, do: nil, else: 0
         {int,_}-> int
       end
     else
-      0
+      if is_opt?, do: nil, else: 0
     end
   end
-  defp to_cast(value, :soft_float, _is_opt?) do
+  defp to_cast(value, :soft_float, is_opt?) do
     if String.Chars.impl_for(value) do
       case Float.parse(to_string(value)) do
-        :error-> 0.0
+        :error-> if is_opt?, do: nil, else: 0.0
         {float,_}->float
       end
     else
-      0.0
+      if is_opt?, do: nil, else: 0.0
     end
   end
 end
