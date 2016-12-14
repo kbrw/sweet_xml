@@ -171,6 +171,12 @@ is being returned.
     's' stands for (s)tring. This forces `xpath/2` to return the value as
     string instead of a char list.
 
+  * `~x"//some/path"S`
+
+    'S' stands for soft (S)tring. This forces `xpath/2` to return the value as
+    string instead of a char list, but if node content is incompatible with a string,
+    set `""`.
+
   * `x"//some/path"o`
 
     'o' stands for (O)ptional. This allows the path to not exist, and will return nil.
@@ -181,13 +187,29 @@ is being returned.
 
     'i' stands for (i)nteger. This forces `xpath/2` to return the value as
     integer instead of a char list.
+
+  * `~x//some/path"I`
+
+    'I' stands for soft (I)integer. This forces `xpath/2` to return the value as
+    integer instead of a char list, but if node content is incompatible with an integer, 
+    set `0`.
     
   * `~x"//some/path"f`
 
     'f' stands for (f)loat. This forces `xpath/2` to return the value as
     float instead of a char list.
 
+  * `~x//some/path"F`
+
+    'F' stands for soft (F)loat. This forces `xpath/2` to return the value as
+    float instead of a char list, but if node content is incompatible with a float, 
+    set `0.0`.
+
   * `~x"//some/path"il` - integer list.
+
+If you use the *optional* modifier `o` together with a *soft* cast modifier
+(uppercase), then the value is set to `nil` when the value is not compatible
+for instance `~x//some/path/text()"Fo` return `nil` if the text is not a number.
 
 Also in the examples section, we always import SweetXml first. This
 makes `x_sigil` available in the current scope. Without it, instead of using

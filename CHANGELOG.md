@@ -1,5 +1,12 @@
 ## Changelog
 
+## 0.6.3
+
+* bugfix: xpath `optional` with cast and void should return nil
+* add "soft" uppercase cast modifier : put defaut value if type 
+  modifier is uppercase "",0,0.0
+* if "soft" and "optional", then return nil with value not compatible
+
 ## 0.6.1
 
 * bugfix: xpath `list` modifier should always return a list

@@ -25,7 +25,7 @@
     </script>
 
     <section id="content">
-      <div class="breadcrumbs">sweet_xml v0.5.0 &rarr; <a href="overview.html">Overview</a> &rarr; <a href="SweetXml.html">SweetXml</a></div>
+      <div class="breadcrumbs">sweet_xml v0.6.3 &rarr; <a href="overview.html">Overview</a> &rarr; <a href="SweetXml.html">SweetXml</a></div>
       <h1>
         SweetXml
         
@@ -138,6 +138,10 @@ iex&gt; doc |&gt; SweetXml.xpath(%SweetXpath{path: &#39;//a/text()&#39;, is_valu
         <h2 id="summary">Summary<span class="detail_header_links"><a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a></span></h2>
         <table class="summary">
           <tr>
+  <td class="summary_signature"><a href="#add_namespace/3">add_namespace(xpath, prefix, uri)</a></td>
+  
+</tr>
+<tr>
   <td class="summary_signature"><a href="#parse/1">parse(doc)</a></td>
   
     <td class="summary_synopsis"><p><code class="inline">doc</code> can be</p>
@@ -169,6 +173,13 @@ boolean fields</p>
     <td class="summary_synopsis"><p>Most common usage of streaming: stream a given tag or a list of tags, and
 optionally “discard” some dom elements in order to free memory during streaming
 for big files which cannot fit entirely in memory</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#transform_by/2">transform_by(sweet_xpath, fun)</a></td>
+  
+    <td class="summary_synopsis"><p>Tags <code class="inline">%SweetXpath{}</code> with <code class="inline">fun</code> to be applied at the end of <code class="inline">xpath</code> query</p>
 </td>
   
 </tr>
@@ -284,6 +295,21 @@ for big files which cannot fit entirely in memory</p>
         <section id="functions_details" class="details_list">
           <h2>Functions</h2>
           <section class="detail">
+  <div class="detail_header" id="add_namespace/3">
+    <span class="signature"><strong>add_namespace(xpath, prefix, uri)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#add_namespace/3" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <section class="docstring">
+    
+  </section>
+  
+</section>
+<section class="detail">
   <div class="detail_header" id="parse/1">
     <span class="signature"><strong>parse(doc)</strong></span>
     <div class="detail_header_links">
@@ -377,6 +403,10 @@ string instead of a char list.</p>
 <li><p><code class="inline">~x&quot;//some/path&quot;i</code></p>
 <p>‘i’ stands for (i)nteger. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return the value as
 integer instead of a char list.</p>
+</li>
+<li><p><code class="inline">~x&quot;//some/path&quot;f</code></p>
+<p>‘f’ stands for (f)loat. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return the value as
+float instead of a char list.</p>
 </li>
 <li><code class="inline">~x&quot;//some/path&quot;il</code> - integer list
 </li>
@@ -478,6 +508,36 @@ iex&gt; SweetXml.stream_tags(doc, :header, discard: [:title])
 ...&gt; |&gt; Stream.map(fn {_, doc} -&gt; SweetXml.xpath(doc, ~x&quot;./title/text()&quot;) end)
 ...&gt; |&gt; Enum.to_list
 [nil, nil]</code></pre>
+
+  </section>
+  
+</section>
+<section class="detail">
+  <div class="detail_header" id="transform_by/2">
+    <span class="signature"><strong>transform_by(sweet_xpath, fun)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#transform_by/2" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <section class="docstring">
+    <p>Tags <code class="inline">%SweetXpath{}</code> with <code class="inline">fun</code> to be applied at the end of <code class="inline">xpath</code> query.</p>
+<h2>Examples</h2>
+<p>  iex&gt; import SweetXml
+  iex&gt; string_to_range = fn str -&gt;
+  …&gt;     [first, last] = str |&gt; String.split(“-“, trim: true) |&gt; Enum.map(&amp;String.to_integer/1)
+  …&gt;     first..last
+  …&gt;   end
+  iex&gt; doc = “<weather><zone><name>north</name><wind-speed>5-15</wind-speed></zone></weather>”
+  iex&gt; doc
+  …&gt; |&gt; xpath(
+  …&gt;      ~x”//weather/zone”l,
+  …&gt;      name: ~x”//name/text()”s |&gt; transform_by(&amp;String.capitalize/1),
+  …&gt;      wind_speed: ~x”./wind-speed/text()”s |&gt; transform_by(string_to_range)
+  …&gt;    )
+  [%{name: "North", wind_speed: 5..15}]</p>
 
   </section>
   
