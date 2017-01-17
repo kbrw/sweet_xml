@@ -1,5 +1,9 @@
 ## Changelog
 
+## 0.6.4
+
+* make it compatible with Elixir 1.4
+
 ## 0.6.3
 
 * bugfix: xpath `optional` with cast and void should return nil
