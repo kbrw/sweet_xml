@@ -356,7 +356,7 @@ defmodule SweetXml do
   end
   def stream(doc, options_callback) do
     Stream.resource fn ->
-      {parent, ref} = waiter = {self, make_ref}
+      {parent, ref} = waiter = {self(), make_ref()}
       opts = options_callback.(fn e -> send(parent, {:event, ref, e}) end)
       pid = spawn fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
       {ref, pid, Process.monitor(pid)}
@@ -523,12 +523,12 @@ defmodule SweetXml do
   def xmap(parent, [{label, spec} | tail], is_keyword) when is_list(spec) do
     [sweet_xpath | subspec] = spec
     result = xmap(parent, tail, is_keyword)
-    Dict.put result, label, xpath(parent, sweet_xpath, subspec)
+    put_in result[label], xpath(parent, sweet_xpath, subspec)
   end
 
   def xmap(parent, [{label, sweet_xpath} | tail], is_keyword) do
     result = xmap(parent, tail, is_keyword)
-    Dict.put result, label, xpath(parent, sweet_xpath)
+    put_in result[label], xpath(parent, sweet_xpath)
   end
 
   @doc """
