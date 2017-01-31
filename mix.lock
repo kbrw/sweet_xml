@@ -1,4 +1,4 @@
-%{"earmark": {:hex, :earmark, "0.1.19"},
-  "ex_doc": {:hex, :ex_doc, "0.7.2"},
+%{"earmark": {:hex, :earmark, "1.1.0", "8c2bf85d725050a92042bc1edf362621004d43ca6241c756f39612084e95487f", [:mix], []},
+  "ex_doc": {:hex, :ex_doc, "0.14.5", "c0433c8117e948404d93ca69411dd575ec6be39b47802e81ca8d91017a0cf83c", [:mix], [{:earmark, "~> 1.0", [hex: :earmark, optional: false]}]},
   "hoedown": {:git, "git://github.com/hoedown/hoedown.git", "365ad578e7b767ffe7126f029c184d727a3e95b3", []},
   "markdown": {:git, "git://github.com/devinus/markdown.git", "cd0df79b6f1cc374499d47f6ba6aaab5096f874f", []}}
