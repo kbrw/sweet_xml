@@ -1,5 +1,9 @@
 ## Changelog
 
+## 0.6.5
+
+* small bugfix : unexpected :halted of enumerable
+
 ## 0.6.4
 
 * make it compatible with Elixir 1.4
