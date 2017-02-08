@@ -358,7 +358,7 @@ defmodule SweetXml do
     Stream.resource fn ->
       {parent, ref} = waiter = {self(), make_ref()}
       opts = options_callback.(fn e -> send(parent, {:event, ref, e}) end)
-      pid = spawn fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
+      pid = spawn_link fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
       {ref, pid, Process.monitor(pid)}
     end, fn {ref, pid, monref} = acc ->
       receive do
@@ -580,6 +580,8 @@ defmodule SweetXml do
        :continuation_fun,
        fn xcont, xexc, xstate ->
          case :xmerl_scan.cont_state(xstate).({:cont, []}) do
+	   {:halted, _acc} ->
+	     xexc.(xstate)
            {:suspended, bin, cont}->
              case waiter do
                nil -> :ok

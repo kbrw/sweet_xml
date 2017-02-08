@@ -1,56 +1,75 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
   <head>
-    <title>SweetXml</title>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
-    <link rel="stylesheet" href="css/elixir.css" type="text/css" media="screen" charset="utf-8" />
-    <script type="text/javascript" charset="utf-8">
-      relpath = '';
-      if (relpath != '') relpath += '/';
-    </script>
-
-    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
-    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
-    <script type="text/javascript" charset="utf-8" src="js/highlight.pack.js"></script>
-    <script type="text/javascript" charset="utf-8">
-      hljs.initHighlightingOnLoad();
-      hljs.configure({languages: []}); //disable autodetect
-    </script>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.14.5">
+    <title>SweetXml – sweet_xml v0.6.4</title>
+    <link rel="stylesheet" href="dist/app-a07cea761b.css" />
+    
+    <script src="dist/sidebar_items-717acc2310.js"></script>
   </head>
+  <body data-type="modules">
+    <script>if(localStorage.getItem('night-mode')) document.body.className += ' night-mode';</script>
 
-  <body>
-    <script type="text/javascript" charset="utf-8">
-      if (window.top.frames.main) document.body.className = 'frames';
-    </script>
+    <div class="main">
+<button class="sidebar-toggle">
+  <i class="icon-menu"></i>
+</button>
+<section class="sidebar">
 
-    <section id="content">
-      <div class="breadcrumbs">sweet_xml v0.6.3 &rarr; <a href="overview.html">Overview</a> &rarr; <a href="SweetXml.html">SweetXml</a></div>
+  
+  <a href="api-reference.html" class="sidebar-projectLink">
+    <div class="sidebar-projectDetails">
+      <h1 class="sidebar-projectName">
+        sweet_xml
+      </h1>
+      <h2 class="sidebar-projectVersion">
+        v0.6.4
+      </h2>
+    </div>
+    
+  </a>
+
+  <div class="sidebar-search">
+    <i class="icon-search"></i>
+    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" />
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+    
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+    
+
+    
+
+    
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
       <h1>
+        <small class="visible-xs">sweet_xml v0.6.4</small>
         SweetXml
+        
         
       </h1>
 
-      <ul class="summary_links">
-        
-          <li><a href="#summary">Summary</a></li>
-        
-        
-        
-          <li><a href="#functions_details">Functions</a></li>
-        
-        
-          <li><a href="#macros_details">Macros</a></li>
-        
-        
-      </ul>
-
       
-        <section id="moduledoc" class="docstring">
-          <p><a href="SweetXml.html"><code class="inline">SweetXml</code></a> is a thin wrapper around <code class="inline">:xmerl</code>. It allows you to convert a
+        <section id="moduledoc">
+          <p><a href="SweetXml.html#content"><code class="inline">SweetXml</code></a> is a thin wrapper around <code class="inline">:xmerl</code>. It allows you to convert a
 string or xmlElement record as defined in <code class="inline">:xmerl</code> to an elixir value such
 as <code class="inline">map</code>, <code class="inline">list</code>, <code class="inline">char_list</code>, or any combination of these.</p>
-<p>For normal sized documents, <a href="SweetXml.html"><code class="inline">SweetXml</code></a> primarily exposes 3 functions</p>
+<p>For normal sized documents, <a href="SweetXml.html#content"><code class="inline">SweetXml</code></a> primarily exposes 3 functions</p>
 <ul>
 <li><a href="SweetXml.html#xpath/2"><code class="inline">SweetXml.xpath/2</code></a> - return a value based on the xpath expression
 </li>
@@ -60,14 +79,18 @@ as <code class="inline">map</code>, <code class="inline">list</code>, <code clas
 from xpath
 </li>
 </ul>
-<p>For something larger, <a href="SweetXml.html"><code class="inline">SweetXml</code></a> mainly exposes 1 function</p>
+<p>For something larger, <a href="SweetXml.html#content"><code class="inline">SweetXml</code></a> mainly exposes 1 function</p>
 <ul>
 <li><a href="SweetXml.html#stream_tags/3"><code class="inline">SweetXml.stream_tags/3</code></a> - stream a given tag or a list of tags, and
 optionally “discard” some dom elements in order to free memory during
 streaming for big files which cannot fit entirely in memory
 </li>
 </ul>
-<h2>Examples</h2>
+<h2 id="module-examples" class="section-heading">
+  <a href="#module-examples" class="hover-link"><i class="icon-link"></i></a>
+  Examples
+</h2>
+
 <p>Simple Xpath</p>
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;h1&gt;&lt;a&gt;Some linked title&lt;/a&gt;&lt;/h1&gt;&quot;
@@ -88,7 +111,11 @@ iex&gt; SweetXml.stream_tags(doc, :li)
 ...&gt; |&gt; Enum.to_list
 [&#39;l1&#39;, &#39;l2&#39;, &#39;l3&#39;]</code></pre>
 <p>For more examples please see help for each individual functions</p>
-<h2>The ~x Sigil</h2>
+<h2 id="module-the-x-sigil" class="section-heading">
+  <a href="#module-the-x-sigil" class="hover-link"><i class="icon-link"></i></a>
+  The ~x Sigil
+</h2>
+
 <p>Notice in the above examples, we used the expression <code class="inline">~x&quot;//a/text()&quot;</code> to
 define the path. The reason is it allows us to more precisely specify what
 is being returned.</p>
@@ -118,7 +145,7 @@ string instead of a char list.</p>
 <li><p><code class="inline">x&quot;//some/path&quot;o</code></p>
 <p>‘o’ stands for (O)ptional. This allows the path to not exist, and will return nil.</p>
 </li>
-<li><code class="inline">~x&quot;//some/path&quot;sl</code> - string list.
+<li><p><code class="inline">~x&quot;//some/path&quot;sl</code> - string list.</p>
 </li>
 </ul>
 <p>Notice also in the examples section, we always import SweetXml first. This
@@ -133,192 +160,284 @@ iex&gt; doc |&gt; SweetXml.xpath(%SweetXpath{path: &#39;//a/text()&#39;, is_valu
       
 
       
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <i class="icon-link"></i>
+            </a>
+            Summary
+          </h1>
+          
 
-      
-        <h2 id="summary">Summary<span class="detail_header_links"><a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a></span></h2>
-        <table class="summary">
-          <tr>
-  <td class="summary_signature"><a href="#add_namespace/3">add_namespace(xpath, prefix, uri)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#parse/1">parse(doc)</a></td>
-  
-    <td class="summary_synopsis"><p><code class="inline">doc</code> can be</p>
-</td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#parse/2">parse(doc, options)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#sigil_x/2">sigil_x(path, modifiers \\ [])</a></td>
-  
-    <td class="summary_synopsis"><p><a href="#sigil_x/2"><code class="inline">sigil_x/2</code></a> simply returns a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> struct, with modifiers converted to
-boolean fields</p>
-</td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#stream/2">stream(doc, options_callback)</a></td>
-  
-    <td class="summary_synopsis"><p>Create an element stream from a xml <code class="inline">doc</code></p>
-</td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#stream_tags/3">stream_tags(doc, tags, options \\ [])</a></td>
-  
-    <td class="summary_synopsis"><p>Most common usage of streaming: stream a given tag or a list of tags, and
-optionally “discard” some dom elements in order to free memory during streaming
-for big files which cannot fit entirely in memory</p>
-</td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#transform_by/2">transform_by(sweet_xpath, fun)</a></td>
-  
-    <td class="summary_synopsis"><p>Tags <code class="inline">%SweetXpath{}</code> with <code class="inline">fun</code> to be applied at the end of <code class="inline">xpath</code> query</p>
-</td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmap/2">xmap(parent, mapping)</a></td>
-  
-    <td class="summary_synopsis"><p><code class="inline">xmap</code> returns a mapping with each value being the result of <code class="inline">xpath</code></p>
-</td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmap/3">xmap(parent, arg2, atom)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlAttribute/1">xmlAttribute(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlAttribute/2">xmlAttribute(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlComment/1">xmlComment(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlComment/2">xmlComment(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlDecl/1">xmlDecl(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlDecl/2">xmlDecl(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlDocument/1">xmlDocument(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlDocument/2">xmlDocument(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlElement/1">xmlElement(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlElement/2">xmlElement(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlNamespace/1">xmlNamespace(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlNamespace/2">xmlNamespace(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlNsNode/1">xmlNsNode(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlNsNode/2">xmlNsNode(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlObj/1">xmlObj(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlObj/2">xmlObj(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlPI/1">xmlPI(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlPI/2">xmlPI(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlText/1">xmlText(args \\ [])</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xmlText/2">xmlText(record, args)</a></td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xpath/2">xpath(parent, spec)</a></td>
-  
-    <td class="summary_synopsis"><p><code class="inline">xpath</code> allows you to query an xml document with xpath</p>
-</td>
-  
-</tr>
-<tr>
-  <td class="summary_signature"><a href="#xpath/3">xpath(parent, sweet_xpath, subspec)</a></td>
-  
-</tr>
-
-        </table>
-      
-
-      
-
-      
-        <section id="functions_details" class="details_list">
-          <h2>Functions</h2>
-          <section class="detail">
-  <div class="detail_header" id="add_namespace/3">
-    <span class="signature"><strong>add_namespace(xpath, prefix, uri)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#add_namespace/3" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+          
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#add_namespace/3">add_namespace(xpath, prefix, uri)</a>
   </div>
   
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#parse/1">parse(doc)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p><code class="inline">doc</code> can be</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#parse/2">parse(doc, options)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#sigil_x/2">sigil_x(path, modifiers \\ [])</a>
+  </div>
+  
+    <div class="summary-synopsis"><p><a href="#sigil_x/2"><code class="inline">sigil_x/2</code></a> simply returns a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> struct, with modifiers converted to
+boolean fields</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#stream/2">stream(doc, options_callback)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Create an element stream from a xml <code class="inline">doc</code></p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#stream_tags/3">stream_tags(doc, tags, options \\ [])</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Most common usage of streaming: stream a given tag or a list of tags, and
+optionally “discard” some dom elements in order to free memory during streaming
+for big files which cannot fit entirely in memory</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#transform_by/2">transform_by(sweet_xpath, fun)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Tags <code class="inline">%SweetXpath{}</code> with <code class="inline">fun</code> to be applied at the end of <code class="inline">xpath</code> query</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmap/2">xmap(parent, mapping)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p><code class="inline">xmap</code> returns a mapping with each value being the result of <code class="inline">xpath</code></p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmap/3">xmap(parent, arg2, atom)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xpath/2">xpath(parent, spec)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p><code class="inline">xpath</code> allows you to query an xml document with xpath</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xpath/3">xpath(parent, sweet_xpath, subspec)</a>
+  </div>
+  
+</div>
+
+  </div>
+
+
+          
+  <div class="summary-macros summary">
+    <h2>
+      <a href="#macros">Macros</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlAttribute/1">xmlAttribute(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlAttribute/2">xmlAttribute(record, args)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlComment/1">xmlComment(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlComment/2">xmlComment(record, args)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlDecl/1">xmlDecl(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlDecl/2">xmlDecl(record, args)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlDocument/1">xmlDocument(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlDocument/2">xmlDocument(record, args)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlElement/1">xmlElement(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlElement/2">xmlElement(record, args)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlNamespace/1">xmlNamespace(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlNamespace/2">xmlNamespace(record, args)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlNsNode/1">xmlNsNode(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlNsNode/2">xmlNsNode(record, args)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlObj/1">xmlObj(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlObj/2">xmlObj(record, args)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlPI/1">xmlPI(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlPI/2">xmlPI(record, args)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlText/1">xmlText(args \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#xmlText/2">xmlText(record, args)</a>
+  </div>
+  
+</div>
+
+  </div>
+
+
+          
+
+        </section>
+      
+
+      
+
+      
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <i class="icon-link"></i>
+            </a>
+            Functions
+          </h1>
+          <div class="detail" id="add_namespace/3">
+  
+  <div class="detail-header">
+    <a href="#add_namespace/3" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">add_namespace(xpath, prefix, uri)</span>
+    
+    
+    
+  </div>
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="parse/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="parse/1">
-    <span class="signature"><strong>parse(doc)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#parse/1" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#parse/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">parse(doc)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     <p><code class="inline">doc</code> can be</p>
 <ul>
@@ -326,42 +445,44 @@ for big files which cannot fit entirely in memory</p>
 </li>
 <li>a binary
 </li>
-<li>any enumerable of binaries (for instance <code class="inline">File.stream!/3</code> result)
+<li>any enumerable of binaries (for instance <a href="https://hexdocs.pm/elixir/File.html#stream!/3"><code class="inline">File.stream!/3</code></a> result)
 </li>
 </ul>
-<p><code class="inline">options</code> are <code class="inline">xmerl</code> options described here <a href="http://www.erlang.org/doc/man/xmerl_scan.html"><a href="http://www.erlang.org/doc/man/xmerl_scan.html">http://www.erlang.org/doc/man/xmerl_scan.html</a></a>,
+<p><code class="inline">options</code> are <code class="inline">xmerl</code> options described here <a href="http://www.erlang.org/doc/man/xmerl_scan.html">http://www.erlang.org/doc/man/xmerl_scan.html</a>,
 see <a href="http://www.erlang.org/doc/apps/xmerl/xmerl_examples.html">the erlang tutorial</a> for usage.</p>
 <p>When <code class="inline">doc</code> is an enumerable, the <code class="inline">:cont_fun</code> option cannot be given.</p>
 <p>Return an <code class="inline">xmlElement</code> record</p>
 
   </section>
+</div>
+<div class="detail" id="parse/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="parse/2">
-    <span class="signature"><strong>parse(doc, options)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#parse/2" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#parse/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">parse(doc, options)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="sigil_x/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="sigil_x/2">
-    <span class="signature"><strong>sigil_x(path, modifiers \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#sigil_x/2" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="sigil_x/1" />
+  
+  <div class="detail-header">
+    <a href="#sigil_x/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">sigil_x(path, modifiers \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     <p><a href="#sigil_x/2"><code class="inline">sigil_x/2</code></a> simply returns a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> struct, with modifiers converted to
 boolean fields</p>
@@ -408,23 +529,23 @@ integer instead of a char list.</p>
 <p>‘f’ stands for (f)loat. This forces <a href="#xpath/2"><code class="inline">xpath/2</code></a> to return the value as
 float instead of a char list.</p>
 </li>
-<li><code class="inline">~x&quot;//some/path&quot;il</code> - integer list
+<li><p><code class="inline">~x&quot;//some/path&quot;il</code> - integer list</p>
 </li>
 </ul>
 
   </section>
+</div>
+<div class="detail" id="stream/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="stream/2">
-    <span class="signature"><strong>stream(doc, options_callback)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#stream/2" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#stream/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">stream(doc, options_callback)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     <p>Create an element stream from a xml <code class="inline">doc</code>.</p>
 <p>This is a lower level API compared to <code class="inline">SweetXml.stream_tags</code>. You can use
@@ -455,18 +576,20 @@ iex&gt; SweetXml.stream(doc, fn emit -&gt;
 3</code></pre>
 
   </section>
+</div>
+<div class="detail" id="stream_tags/3">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="stream_tags/3">
-    <span class="signature"><strong>stream_tags(doc, tags, options \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#stream_tags/3" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="stream_tags/2" />
+  
+  <div class="detail-header">
+    <a href="#stream_tags/3" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">stream_tags(doc, tags, options \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     <p>Most common usage of streaming: stream a given tag or a list of tags, and
 optionally “discard” some dom elements in order to free memory during streaming
@@ -510,21 +633,25 @@ iex&gt; SweetXml.stream_tags(doc, :header, discard: [:title])
 [nil, nil]</code></pre>
 
   </section>
+</div>
+<div class="detail" id="transform_by/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="transform_by/2">
-    <span class="signature"><strong>transform_by(sweet_xpath, fun)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#transform_by/2" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#transform_by/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">transform_by(sweet_xpath, fun)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     <p>Tags <code class="inline">%SweetXpath{}</code> with <code class="inline">fun</code> to be applied at the end of <code class="inline">xpath</code> query.</p>
-<h2>Examples</h2>
+<h2 id="transform_by/2-examples" class="section-heading">
+  <a href="#transform_by/2-examples" class="hover-link"><i class="icon-link"></i></a>
+  Examples
+</h2>
+
 <p>  iex&gt; import SweetXml
   iex&gt; string_to_range = fn str -&gt;
   …&gt;     [first, last] = str |&gt; String.split(“-“, trim: true) |&gt; Enum.map(&amp;String.to_integer/1)
@@ -537,26 +664,30 @@ iex&gt; SweetXml.stream_tags(doc, :header, discard: [:title])
   …&gt;      name: ~x”//name/text()”s |&gt; transform_by(&amp;String.capitalize/1),
   …&gt;      wind_speed: ~x”./wind-speed/text()”s |&gt; transform_by(string_to_range)
   …&gt;    )
-  [%{name: "North", wind_speed: 5..15}]</p>
+  [%{name: “North”, wind_speed: 5..15}]</p>
 
   </section>
+</div>
+<div class="detail" id="xmap/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmap/2">
-    <span class="signature"><strong>xmap(parent, mapping)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#xmap/2" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmap/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmap(parent, mapping)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     <p><code class="inline">xmap</code> returns a mapping with each value being the result of <code class="inline">xpath</code></p>
 <p>Just as <code class="inline">xpath</code>, you can nest the mapping structure. Please see <code class="inline">xpath</code> for
 more detail.</p>
-<h2>Examples</h2>
+<h2 id="xmap/2-examples" class="section-heading">
+  <a href="#xmap/2-examples" class="hover-link"><i class="icon-link"></i></a>
+  Examples
+</h2>
+
 <p>Simple</p>
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;h1&gt;&lt;a&gt;Some linked title&lt;/a&gt;&lt;/h1&gt;&quot;
@@ -599,33 +730,33 @@ iex&gt; doc
 [message: &#39;Message&#39;, ul: %{a: &#39;Two&#39;}]</code></pre>
 
   </section>
+</div>
+<div class="detail" id="xmap/3">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmap/3">
-    <span class="signature"><strong>xmap(parent, arg2, atom)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#xmap/3" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmap/3" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmap(parent, arg2, atom)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xpath/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xpath/2">
-    <span class="signature"><strong>xpath(parent, spec)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#xpath/2" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xpath/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xpath(parent, spec)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     <p><code class="inline">xpath</code> allows you to query an xml document with xpath.</p>
 <p>The second argument to xpath is a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> struct. The optional third
@@ -633,7 +764,11 @@ argument is a keyword list, such that the value of each keyword is also
 either a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> or a list with head being a <a href="SweetXpath.html"><code class="inline">SweetXpath</code></a> and tail being
 another keyword list exactly like before. Please see examples below for better
 understanding.</p>
-<h2>Examples</h2>
+<h2 id="xpath/2-examples" class="section-heading">
+  <a href="#xpath/2-examples" class="hover-link"><i class="icon-link"></i></a>
+  Examples
+</h2>
+
 <p>Simple</p>
 <pre><code class="iex elixir">iex&gt; import SweetXml
 iex&gt; doc = &quot;&lt;h1&gt;&lt;a&gt;Some linked title&lt;/a&gt;&lt;/h1&gt;&quot;
@@ -658,335 +793,377 @@ iex&gt; doc
 %{ul: %{a: &#39;Two&#39;}}</code></pre>
 
   </section>
+</div>
+<div class="detail" id="xpath/3">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xpath/3">
-    <span class="signature"><strong>xpath(parent, sweet_xpath, subspec)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(function)</span>
-      <a href="#xpath/3" class="detail_link" title="Link to this function">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xpath/3" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xpath(parent, sweet_xpath, subspec)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
-  
-</section>
+</div>
 
         </section>
       
 
       
-        <section id="macros_details" class="details_list">
-          <h2>Macros</h2>
-          <section class="detail">
-  <div class="detail_header" id="xmlAttribute/1">
-    <span class="signature"><strong>xmlAttribute(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlAttribute/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
-  </div>
+        <section id="macros" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#macros">
+              <i class="icon-link"></i>
+            </a>
+            Macros
+          </h1>
+          <div class="detail" id="xmlAttribute/1">
   
+    <span id="xmlAttribute/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlAttribute/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlAttribute(args \\ [])</span>
+    
+    
+    
+  </div>
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlAttribute/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlAttribute/2">
-    <span class="signature"><strong>xmlAttribute(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlAttribute/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlAttribute/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlAttribute(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlComment/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlComment/1">
-    <span class="signature"><strong>xmlComment(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlComment/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="xmlComment/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlComment/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlComment(args \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlComment/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlComment/2">
-    <span class="signature"><strong>xmlComment(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlComment/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlComment/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlComment(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlDecl/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlDecl/1">
-    <span class="signature"><strong>xmlDecl(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlDecl/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="xmlDecl/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlDecl/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlDecl(args \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlDecl/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlDecl/2">
-    <span class="signature"><strong>xmlDecl(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlDecl/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlDecl/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlDecl(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlDocument/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlDocument/1">
-    <span class="signature"><strong>xmlDocument(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlDocument/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="xmlDocument/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlDocument/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlDocument(args \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlDocument/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlDocument/2">
-    <span class="signature"><strong>xmlDocument(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlDocument/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlDocument/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlDocument(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlElement/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlElement/1">
-    <span class="signature"><strong>xmlElement(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlElement/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="xmlElement/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlElement/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlElement(args \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlElement/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlElement/2">
-    <span class="signature"><strong>xmlElement(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlElement/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlElement/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlElement(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlNamespace/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlNamespace/1">
-    <span class="signature"><strong>xmlNamespace(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlNamespace/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="xmlNamespace/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlNamespace/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlNamespace(args \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlNamespace/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlNamespace/2">
-    <span class="signature"><strong>xmlNamespace(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlNamespace/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlNamespace/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlNamespace(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlNsNode/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlNsNode/1">
-    <span class="signature"><strong>xmlNsNode(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlNsNode/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="xmlNsNode/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlNsNode/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlNsNode(args \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlNsNode/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlNsNode/2">
-    <span class="signature"><strong>xmlNsNode(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlNsNode/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlNsNode/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlNsNode(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlObj/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlObj/1">
-    <span class="signature"><strong>xmlObj(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlObj/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="xmlObj/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlObj/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlObj(args \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlObj/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlObj/2">
-    <span class="signature"><strong>xmlObj(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlObj/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlObj/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlObj(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlPI/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlPI/1">
-    <span class="signature"><strong>xmlPI(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlPI/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="xmlPI/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlPI/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlPI(args \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlPI/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlPI/2">
-    <span class="signature"><strong>xmlPI(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlPI/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlPI/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlPI(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlText/1">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlText/1">
-    <span class="signature"><strong>xmlText(args \\ [])</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlText/1" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+    <span id="xmlText/0" />
+  
+  <div class="detail-header">
+    <a href="#xmlText/1" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlText(args \\ [])</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
+</div>
+<div class="detail" id="xmlText/2">
   
-</section>
-<section class="detail">
-  <div class="detail_header" id="xmlText/2">
-    <span class="signature"><strong>xmlText(record, args)</strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(macro)</span>
-      <a href="#xmlText/2" class="detail_link" title="Link to this macro">#</a>
-      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
-    </div>
+  <div class="detail-header">
+    <a href="#xmlText/2" class="detail-link" title="Link to this macro">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">xmlText(record, args)</span>
+    
+    
+    
   </div>
-  
   <section class="docstring">
     
   </section>
-  
-</section>
+</div>
 
         </section>
       
 
       
-    </section>
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.14.5),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+            </span>
+        </p>
+        <button class="night-mode-toggle" />
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  <script src="dist/app-4aef34ad5f.js"></script>
   </body>
 </html>
+
