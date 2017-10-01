@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.5">
-    <title>SweetXml – sweet_xml v0.6.4</title>
+    <title>SweetXml – sweet_xml v0.6.5</title>
     <link rel="stylesheet" href="dist/app-a07cea761b.css" />
     
     <script src="dist/sidebar_items-717acc2310.js"></script>
@@ -26,7 +26,7 @@
         sweet_xml
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.6.4
+        v0.6.5
       </h2>
     </div>
     
@@ -58,7 +58,7 @@
 
 
       <h1>
-        <small class="visible-xs">sweet_xml v0.6.4</small>
+        <small class="visible-xs">sweet_xml v0.6.5</small>
         SweetXml
         
         
@@ -652,19 +652,19 @@ iex&gt; SweetXml.stream_tags(doc, :header, discard: [:title])
   Examples
 </h2>
 
-<p>  iex&gt; import SweetXml
-  iex&gt; string_to_range = fn str -&gt;
-  …&gt;     [first, last] = str |&gt; String.split(“-“, trim: true) |&gt; Enum.map(&amp;String.to_integer/1)
-  …&gt;     first..last
-  …&gt;   end
-  iex&gt; doc = “<weather><zone><name>north</name><wind-speed>5-15</wind-speed></zone></weather>”
-  iex&gt; doc
-  …&gt; |&gt; xpath(
-  …&gt;      ~x”//weather/zone”l,
-  …&gt;      name: ~x”//name/text()”s |&gt; transform_by(&amp;String.capitalize/1),
-  …&gt;      wind_speed: ~x”./wind-speed/text()”s |&gt; transform_by(string_to_range)
-  …&gt;    )
-  [%{name: “North”, wind_speed: 5..15}]</p>
+<pre><code class="iex elixir">iex&gt; import SweetXml
+iex&gt; string_to_range = fn str -&gt;
+...&gt;     [first, last] = str |&gt; String.split(&quot;-&quot;, trim: true) |&gt; Enum.map(&amp;String.to_integer/1)
+...&gt;     first..last
+...&gt;   end
+iex&gt; doc = &quot;&lt;weather&gt;&lt;zone&gt;&lt;name&gt;north&lt;/name&gt;&lt;wind-speed&gt;5-15&lt;/wind-speed&gt;&lt;/zone&gt;&lt;/weather&gt;&quot;
+iex&gt; doc
+...&gt; |&gt; xpath(
+...&gt;      ~x&quot;//weather/zone&quot;l,
+...&gt;      name: ~x&quot;//name/text()&quot;s |&gt; transform_by(&amp;String.capitalize/1),
+...&gt;      wind_speed: ~x&quot;./wind-speed/text()&quot;s |&gt; transform_by(string_to_range)
+...&gt;    )
+[%{name: &quot;North&quot;, wind_speed: 5..15}]</code></pre>
 
   </section>
 </div>

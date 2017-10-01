@@ -35,8 +35,7 @@ defmodule SweetXml do
       optionally "discard" some dom elements in order to free memory during
       streaming for big files which cannot fit entirely in memory
 
-  ## Examples
-
+  ## Examples 
   Simple Xpath
 
       iex> import SweetXml
@@ -536,19 +535,19 @@ defmodule SweetXml do
 
   ## Examples
 
-    iex> import SweetXml
-    iex> string_to_range = fn str ->
-    ...>     [first, last] = str |> String.split("-", trim: true) |> Enum.map(&String.to_integer/1)
-    ...>     first..last
-    ...>   end
-    iex> doc = "<weather><zone><name>north</name><wind-speed>5-15</wind-speed></zone></weather>"
-    iex> doc
-    ...> |> xpath(
-    ...>      ~x"//weather/zone"l,
-    ...>      name: ~x"//name/text()"s |> transform_by(&String.capitalize/1),
-    ...>      wind_speed: ~x"./wind-speed/text()"s |> transform_by(string_to_range)
-    ...>    )
-    [%{name: "North", wind_speed: 5..15}]
+      iex> import SweetXml
+      iex> string_to_range = fn str ->
+      ...>     [first, last] = str |> String.split("-", trim: true) |> Enum.map(&String.to_integer/1)
+      ...>     first..last
+      ...>   end
+      iex> doc = "<weather><zone><name>north</name><wind-speed>5-15</wind-speed></zone></weather>"
+      iex> doc
+      ...> |> xpath(
+      ...>      ~x"//weather/zone"l,
+      ...>      name: ~x"//name/text()"s |> transform_by(&String.capitalize/1),
+      ...>      wind_speed: ~x"./wind-speed/text()"s |> transform_by(string_to_range)
+      ...>    )
+      [%{name: "North", wind_speed: 5..15}]
   """
   def transform_by(%SweetXpath{}=sweet_xpath, fun) when is_function(fun) do
     %{sweet_xpath | transform_fun: fun}
