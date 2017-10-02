@@ -419,6 +419,13 @@ defmodule SweetXmlTest do
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()])  == '239541'
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()]s) == "239541"
     assert xpath(doc, ~x[/fantasy_content/league/league_id/text()]i) ==  239541
+    assert xpath(doc, ~x[/fantasy_content/league/short_invitation_url/text()]) ==  nil
+    assert xpath(doc, ~x[/fantasy_content/league/short_invitation_url/text()]o) ==  nil
+    assert xpath(doc, ~x[/fantasy_content/league/short_invitation_url/text()]os) ==  nil
+    assert xpath(doc, ~x[/fantasy_content/league/short_invitation_url/text()]oS) ==  nil
+    assert xpath(doc, ~x[/fantasy_content/idontexist/text()]o) ==  nil
+    assert xpath(doc, ~x[/fantasy_content/idontexist/text()]os) ==  nil
+    assert xpath(doc, ~x[/fantasy_content/idontexist/text()]oS) ==  nil
     assert xpath(doc, ~x[//total/text()]f) ==  204.68
   end
 

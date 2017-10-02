@@ -433,7 +433,10 @@ defmodule SweetXml do
     spec = %SweetXpath{spec | is_list: true}
     get_current_entities(parent, spec)
     |> Enum.map(&(_value(&1) |> to_cast(string_type, is_opt?)))
-    |> Enum.join
+    |> case do
+      [] -> nil
+      items -> Enum.join(items)
+    end
     |> spec.transform_fun.()
   end
 
