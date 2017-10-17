@@ -89,6 +89,13 @@ result = doc |> xpath(~x"//matchup/name/text()"l) # `l` stands for (l)ist
 assert result == ['Match One', 'Match Two', 'Match Three']
 ```
 
+get a list of winner-id by attributes
+
+```elixir
+result = doc |> xpath(~x"//matchup/@winner-id"l)
+assert result == ['1', '2', '1']
+```
+
 get a list of matchups with different map structure
 
 ```elixir
