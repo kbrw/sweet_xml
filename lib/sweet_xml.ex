@@ -189,7 +189,7 @@ defmodule SweetXml do
   """
   def sigil_x(path, modifiers \\ '') do
     %SweetXpath{
-      path: String.to_char_list(path),
+      path: String.to_charlist(path),
       is_value: not ?e in modifiers,
       is_list: ?l in modifiers,
       is_keyword: ?k in modifiers,
@@ -207,7 +207,7 @@ defmodule SweetXml do
   end
 
   def add_namespace(xpath, prefix, uri) do
-    %SweetXpath{xpath | namespaces: [{to_char_list(prefix), to_char_list(uri)}
+    %SweetXpath{xpath | namespaces: [{to_charlist(prefix), to_charlist(uri)}
                                      | xpath.namespaces]}
   end
 
