@@ -442,3 +442,11 @@ result = file_stream
 
 assert result == ['\n        First', 'Second\n      ', 'Third', 'Forth', 'first star']
 ```
+
+
+:warning: In case of large document, you may want to use the `discard` option to avoid memory leak.
+
+```elixir
+result = file_stream
+|> stream_tags([:li, :special_match_key], discard: [:li, :special_match_key])
+```
