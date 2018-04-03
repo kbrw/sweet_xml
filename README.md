@@ -197,7 +197,7 @@ is being returned.
 
   * `~x//some/path"I`
 
-    'I' stands for soft (I)integer. This forces `xpath/2` to return the value as
+    'I' stands for soft (I)nteger. This forces `xpath/2` to return the value as
     integer instead of a char list, but if node content is incompatible with an integer, 
     set `0`.
     
