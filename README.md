@@ -169,7 +169,7 @@ is being returned.
 
   * `~x"//some/path"k`
 
-     'k' stands for (K)eyword. This forces `xpath/2` to return a Keyword instead of a Map.
+     'k' stands for (k)eyword. This forces `xpath/2` to return a Keyword instead of a Map.
 
   * `~x"//some/path"el` - mix of the above
 
@@ -186,7 +186,7 @@ is being returned.
 
   * `x"//some/path"o`
 
-    'o' stands for (O)ptional. This allows the path to not exist, and will return nil.
+    'o' stands for (o)ptional. This allows the path to not exist, and will return nil.
 
   * `~x"//some/path"sl` - string list.
 
