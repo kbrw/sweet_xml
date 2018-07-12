@@ -56,6 +56,9 @@ defmodule SweetXmlTest do
     result = doc |> xpath(~x"//header/text()"s)
     assert result == "Content Header"
 
+    result = doc |> xpath(~x"//doesntexist/text()"so)
+    assert result == nil
+
     result = doc |> xpath(~x"//span[contains(@class,'badge')][@data-attr='first-half']/text()"l)
     assert result == ['One', 'Two', 'Three', 'Four', 'Five']
 

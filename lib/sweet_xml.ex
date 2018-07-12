@@ -430,10 +430,9 @@ defmodule SweetXml do
   end
 
   def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: string_type, is_optional: is_opt?} = spec) when string_type in [:string,:soft_string] do
-    spec = %SweetXpath{spec | is_list: true}
     get_current_entities(parent, spec)
-    |> Enum.map(&(_value(&1) |> to_cast(string_type, is_opt?)))
-    |> Enum.join
+    |> _value() 
+    |> to_cast(string_type, is_opt?)
     |> spec.transform_fun.()
   end
 
