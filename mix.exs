@@ -25,9 +25,6 @@ defmodule SweetXml.Mixfile do
   end
 
   defp deps do
-    [
-      {:ex_doc, "~> 0.14.5", only: :dev},
-      {:earmark,"~> 1.1.0 ", only: :dev}
-    ]
+    [{:ex_doc, "~> 0.19", only: :dev}]
   end
 end
