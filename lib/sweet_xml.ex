@@ -190,7 +190,7 @@ defmodule SweetXml do
   def sigil_x(path, modifiers \\ '') do
     %SweetXpath{
       path: String.to_charlist(path),
-      is_value: not ?e in modifiers,
+      is_value: not(?e in modifiers),
       is_list: ?l in modifiers,
       is_keyword: ?k in modifiers,
       is_optional: ?o in modifiers,

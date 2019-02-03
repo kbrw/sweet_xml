@@ -449,7 +449,7 @@ defmodule SweetXmlTest do
     |> xpath(
       ~x"//fantasy_content/league",
       iso_week: ~x"./start_date/text()"s |> transform_by(date_string_to_iso_week),
-      scoreboard: ~x"./scoreboard" |> transform_by(parse_scoreboard),
+      scoreboard: ~x"./scoreboard" |> transform_by(parse_scoreboard)
     )
 
     assert result == %{iso_week: 36, scoreboard: %{week: 16, matchups: 4}}
