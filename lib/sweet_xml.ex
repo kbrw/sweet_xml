@@ -267,7 +267,7 @@ defmodule SweetXml do
       ['l1', 'l2', 'l3', nil]
 
 
-  Becareful if you set `options[:discard]`. If any of the discarded tags is nested
+  Be careful if you set `options[:discard]`. If any of the discarded tags is nested
   inside a kept tag, you will not be able to access them.
 
   Examples:
