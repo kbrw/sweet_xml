@@ -184,7 +184,7 @@ is being returned.
     string instead of a char list, but if node content is incompatible with a string,
     set `""`.
 
-  * `x"//some/path"o`
+  * `~x"//some/path"o`
 
     'o' stands for (o)ptional. This allows the path to not exist, and will return nil.
 
