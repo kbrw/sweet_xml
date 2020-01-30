@@ -9,7 +9,7 @@ as `map`, `list`, `string`, `integer`, `float` or any combination of these.
 ## Installation
 Add dependency to your project's mix.exs
 
-```xml
+```elixir
   def deps do
     [{:sweet_xml, "~> 0.6.6"}]
   end
