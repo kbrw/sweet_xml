@@ -37,21 +37,21 @@ defmodule SweetXml do
 
   ## Examples
 
-  Simple Xpath
+  Simple Xpath:
 
       iex> import SweetXml
       iex> doc = "<h1><a>Some linked title</a></h1>"
       iex> doc |> xpath(~x"//a/text()")
       'Some linked title'
 
-  Nested Mapping
+  Nested Mapping:
 
       iex> import SweetXml
       iex> doc = "<body><header><p>Message</p><ul><li>One</li><li><a>Two</a></li></ul></header></body>"
       iex> doc |> xpath(~x"//header", message: ~x"./p/text()", a_in_li: ~x".//li/a/text()"l)
       %{a_in_li: ['Two'], message: 'Message'}
 
-  Streaming
+  Streaming:
 
       iex> import SweetXml
       iex> doc = ["<ul><li>l1</li><li>l2", "</li><li>l3</li></ul>"]
@@ -129,12 +129,12 @@ defmodule SweetXml do
 
   @doc ~s"""
   `sigil_x/2` simply returns a `SweetXpath` struct, with modifiers converted to
-  boolean fields
+  boolean fields:
 
       iex> SweetXml.sigil_x("//some/path", 'e')
       %SweetXpath{path: '//some/path', is_value: false, cast_to: false, is_list: false, is_keyword: false}
 
-  or you can simply import and use the `~x` expression
+  Or you can simply import and use the `~x` expression:
 
       iex> import SweetXml
       iex> ~x"//some/path"e
@@ -223,7 +223,7 @@ defmodule SweetXml do
 
   When `doc` is an enumerable, the `:cont_fun` option cannot be given.
 
-  Return an `xmlElement` record
+  Returns an `xmlElement` record.
   """
   def parse(doc), do: parse(doc, [])
   def parse(doc, options) when is_binary(doc) do
@@ -240,7 +240,7 @@ defmodule SweetXml do
 
   @doc """
   Most common usage of streaming: stream a given tag or a list of tags, and
-  optionally "discard" some dom elements in order to free memory during streaming
+  optionally "discard" some DOM elements in order to free memory during streaming
   for big files which cannot fit entirely in memory.
 
   Note that each matched tag produces it's own tree. If a given tag appears in
@@ -253,7 +253,7 @@ defmodule SweetXml do
   - `options[:discard]` is the list of tag which will be discarded:
      not added to its parent DOM.
 
-  Examples:
+  ## Examples
 
       iex> import SweetXml
       iex> doc = ["<ul><li>l1</li><li>l2", "</li><li>l3</li></ul>"]
@@ -270,7 +270,7 @@ defmodule SweetXml do
   Be careful if you set `options[:discard]`. If any of the discarded tags is nested
   inside a kept tag, you will not be able to access them.
 
-  Examples:
+  ## Examples
 
       iex> import SweetXml
       iex> doc = ["<header>", "<title>XML</title", "><header><title>Nested</title></header></header>"]
@@ -320,7 +320,7 @@ defmodule SweetXml do
   end
 
   @doc """
-  Create an element stream from a xml `doc`.
+  Create an element stream from a XML `doc`.
 
   This is a lower level API compared to `SweetXml.stream_tags`. You can use
   the `options_callback` argument to get fine control of what data to be streamed.
@@ -379,7 +379,7 @@ defmodule SweetXml do
   end
 
   @doc ~S"""
-  `xpath` allows you to query an xml document with xpath.
+  `xpath` allows you to query an XML document with xpath.
 
   The second argument to xpath is a `SweetXpath` struct. The optional third
   argument is a keyword list, such that the value of each keyword is also
@@ -389,21 +389,21 @@ defmodule SweetXml do
 
   ## Examples
 
-  Simple
+  Simple:
 
       iex> import SweetXml
       iex> doc = "<h1><a>Some linked title</a></h1>"
       iex> doc |> xpath(~x"//a/text()")
       'Some linked title'
 
-  With optional mapping
+  With optional mapping:
 
       iex> import SweetXml
       iex> doc = "<body><header><p>Message</p><ul><li>One</li><li><a>Two</a></li></ul></header></body>"
       iex> doc |> xpath(~x"//header", message: ~x"./p/text()", a_in_li: ~x".//li/a/text()"l)
       %{a_in_li: ['Two'], message: 'Message'}
 
-  With optional mapping and nesting
+  With optional mapping and nesting:
 
       iex> import SweetXml
       iex> doc = "<body><header><p>Message</p><ul><li>One</li><li><a>Two</a></li></ul></header></body>"
@@ -416,6 +416,7 @@ defmodule SweetXml do
       ...>      ]
       ...>    )
       %{ul: %{a: 'Two'}}
+
   """
   def xpath(parent, spec) when not is_tuple(parent) do
     parent |> parse |> xpath(spec)
@@ -445,7 +446,6 @@ defmodule SweetXml do
     get_current_entities(parent, spec) |> spec.transform_fun.()
   end
 
-
   def xpath(parent, sweet_xpath, subspec) do
     if sweet_xpath.is_list do
       current_entities = xpath(parent, sweet_xpath)
@@ -464,21 +464,21 @@ defmodule SweetXml do
 
   ## Examples
 
-  Simple
+  Simple:
 
       iex> import SweetXml
       iex> doc = "<h1><a>Some linked title</a></h1>"
       iex> doc |> xmap(a: ~x"//a/text()")
       %{a: 'Some linked title'}
 
-  With optional mapping
+  With optional mapping:
 
       iex> import SweetXml
       iex> doc = "<body><header><p>Message</p><ul><li>One</li><li><a>Two</a></li></ul></header></body>"
       iex> doc |> xmap(message: ~x"//p/text()", a_in_li: ~x".//li/a/text()"l)
       %{a_in_li: ['Two'], message: 'Message'}
 
-  With optional mapping and nesting
+  With optional mapping and nesting:
 
       iex> import SweetXml
       iex> doc = "<body><header><p>Message</p><ul><li>One</li><li><a>Two</a></li></ul></header></body>"
