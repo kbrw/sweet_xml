@@ -1,5 +1,11 @@
 ## Changelog
 
+## 0.6.6
+
+* small bugfix: Fix compilation warnings on newer versions of Elixir
+* doc updates
+
+
 ## 0.6.5 (2017-02-08)
 
 * small bugfix : unexpected `:halted` of enumerable
