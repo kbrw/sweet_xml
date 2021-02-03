@@ -1,15 +1,29 @@
-# SweetXml [![Build Status](https://api.travis-ci.org/kbrw/sweet_xml.svg)][Continuous Integration]
+# SweetXml
 
-[Continuous Integration]: http://travis-ci.org/kbrw/sweet_xml "Build status by Travis-CI"
+[![Build Status](https://api.travis-ci.org/kbrw/sweet_xml.svg)](http://travis-ci.org/kbrw/sweet_xml)
+[![Module Version](https://img.shields.io/hexpm/v/sweet_xml.svg)](https://hex.pm/packages/sweet_xml)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/sweet_xml/)
+[![Total Download](https://img.shields.io/hexpm/dt/sweet_xml.svg)](https://hex.pm/packages/sweet_xml)
+[![License](https://img.shields.io/hexpm/l/sweet_xml.svg)](https://github.com/kbrw/sweet_xml/blob/master/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/kbrw/sweet_xml.svg)](https://github.com/kbrw/sweet_xml/commits/master)
 
 `SweetXml` is a thin wrapper around `:xmerl`. It allows you to convert a
 `char_list` or `xmlElement` record as defined in `:xmerl` to an elixir value such
 as `map`, `list`, `string`, `integer`, `float` or any combination of these.
 
+## Installation
+
+Add dependency to your project's `mix.exs`:
+
+```elixir
+def deps do
+  [{:sweet_xml, "~> 0.6.6"}]
+end
+```
 
 ## Examples
 
-Given a xml document such as below
+Given an XML document such as below:
 
 ```xml
 <?xml version="1.05" encoding="UTF-8"?>
@@ -57,21 +71,21 @@ Given a xml document such as below
   </matchups>
 </game>
 ```
-We can do the following
+We can do the following:
 
 ```elixir
 import SweetXml
 doc = "..." # as above
 ```
 
-get the name of the first match
+Get the name of the first match:
 
 ```elixir
 result = doc |> xpath(~x"//matchup/name/text()") # `sigil_x` for (x)path
 assert result == 'Match One'
 ```
 
-get the xml record of the name of the first match
+Get the XML record of the name of the first match:
 
 ```elixir
 result = doc |> xpath(~x"//matchup/name"e) # `e` is the modifier for (e)ntity
@@ -82,21 +96,21 @@ assert result == {:xmlElement, :name, :name, [], {:xmlNamespace, [], []},
         ...}
 ```
 
-get the full list of matchup name
+Get the full list of matchup name:
 
 ```elixir
 result = doc |> xpath(~x"//matchup/name/text()"l) # `l` stands for (l)ist
 assert result == ['Match One', 'Match Two', 'Match Three']
 ```
 
-get a list of winner-id by attributes
+Get a list of winner-id by attributes:
 
 ```elixir
 result = doc |> xpath(~x"//matchup/@winner-id"l)
 assert result == ['1', '2', '1']
 ```
 
-get a list of matchups with different map structure
+Get a list of matchups with different map structure:
 
 ```elixir
 result = doc |> xpath(
@@ -114,7 +128,7 @@ assert result == [
 ]
 ```
 
-Or directly return a mapping of your liking
+Or directly return a mapping of your liking:
 
 ```elixir
 result = doc |> xmap(
@@ -184,7 +198,7 @@ is being returned.
     string instead of a char list, but if node content is incompatible with a string,
     set `""`.
 
-  * `x"//some/path"o`
+  * `~x"//some/path"o`
 
     'o' stands for (o)ptional. This allows the path to not exist, and will return nil.
 
@@ -198,9 +212,9 @@ is being returned.
   * `~x//some/path"I`
 
     'I' stands for soft (I)nteger. This forces `xpath/2` to return the value as
-    integer instead of a char list, but if node content is incompatible with an integer, 
+    integer instead of a char list, but if node content is incompatible with an integer,
     set `0`.
-    
+
   * `~x"//some/path"f`
 
     'f' stands for (f)loat. This forces `xpath/2` to return the value as
@@ -209,7 +223,7 @@ is being returned.
   * `~x//some/path"F`
 
     'F' stands for soft (F)loat. This forces `xpath/2` to return the value as
-    float instead of a char list, but if node content is incompatible with a float, 
+    float instead of a char list, but if node content is incompatible with a float,
     set `0.0`.
 
   * `~x"//some/path"il` - integer list.
@@ -230,7 +244,7 @@ Note the use of char_list in the path definition.
 
 ## Namespace support
 
-Given a xml document such as below
+Given a XML document such as below
 
 ```xml
 <?xml version="1.05" encoding="UTF-8"?>
@@ -255,7 +269,7 @@ Given a xml document such as below
 </game>
 ```
 
-We can do the following
+We can do the following:
 
 ```elixir
 import SweetXml
@@ -278,7 +292,7 @@ result = doc
 assert result == 'Match One'
 ```
 
-We can specify multiple namespace prefixes: 
+We can specify multiple namespace prefixes:
 
 ```elixir
 result = doc
@@ -289,14 +303,13 @@ result = doc
 assert result == '5'
 ```
 
-
 ## From Chaining to Nesting
 
 Here's a brief explanation to how nesting came about.
 
 ### Chaining
 
-Both `xpath` and `xmap` can take an `:xmerl` xml record as the first argment.
+Both `xpath` and `xmap` can take an `:xmerl` XML record as the first argument.
 Therefore you can chain calls to these functions like below:
 
 ```elixir
@@ -364,7 +377,7 @@ result = doc |> xpath(
 ```
 
 The same can be used to break parsing code into reusable functions that can be
-used in nesting
+used in nesting:
 
 ```elixir
 doc = "<li><name><first>john</first><last>doe</last></name><age>30</age></li>"
@@ -389,8 +402,8 @@ For more examples, please take a look at the tests and help.
 
 ## Streaming
 
-`SweetXml` now also supports streaming in various forms. Here's a sample xml doc.
-Notice the certain lines have xml tags that span multiple lines.
+`SweetXml` now also supports streaming in various forms. Here's a sample XML doc.
+Notice the certain lines have XML tags that span multiple lines:
 
 ```xml
 <?xml version="1.05" encoding="UTF-8"?>
@@ -416,9 +429,9 @@ Notice the certain lines have xml tags that span multiple lines.
 </html>
 ```
 
-### Working with `File.stream!`
+### Working with `File.stream!/1`
 
-Working with streams is exactly the same as working with binaries.
+Working with streams is exactly the same as working with binaries:
 
 ```elixir
 File.stream!("file_above.xml") |> xpath(...)
@@ -427,7 +440,7 @@ File.stream!("file_above.xml") |> xpath(...)
 ### `SweetXml` element streaming
 
 Once you have a file stream, you may not want to work with the entire document to
-save memory.
+save memory:
 
 ```elixir
 file_stream = File.stream!("file_above.xml")
@@ -443,10 +456,16 @@ result = file_stream
 assert result == ['\n        First', 'Second\n      ', 'Third', 'Forth', 'first star']
 ```
 
-
-:warning: In case of large document, you may want to use the `discard` option to avoid memory leak.
+**Warning:** In case of large document, you may want to use the `discard`
+option to avoid memory leak.
 
 ```elixir
 result = file_stream
 |> stream_tags([:li, :special_match_key], discard: [:li, :special_match_key])
 ```
+
+## Copyright and License
+
+Copyright (c) 2014, Frank Liu
+
+SweetXml source code is licensed under the [MIT License](https://github.com/kbrw/sweet_xml/blob/master/LICENSE).
