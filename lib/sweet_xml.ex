@@ -225,15 +225,26 @@ defmodule SweetXml do
 
   Returns an `xmlElement` record.
   """
-  def parse(doc), do: parse(doc, [])
-  def parse(doc, options) when is_binary(doc) do
-    doc |> :erlang.binary_to_list |> parse(options)
+  def parse(doc, opts \\ []) do
+    ets = :ets.new(nil, [])
+    {dtd_arg, opts} = Keyword.pop(opts, :dtd, :all)
+    opts = SweetXml.Options.handle_dtd(dtd_arg).(ets) ++ opts
+    try do
+      do_parse(doc, opts)
+    after
+      _ = :ets.delete(ets)
+    end
   end
-  def parse([c | _] = doc, options) when is_integer(c) do
+
+  @doc false
+  def do_parse(doc, options) when is_binary(doc) do
+    doc |> :erlang.binary_to_list |> do_parse(options)
+  end
+  def do_parse([c | _] = doc, options) when is_integer(c) do
     {parsed_doc, _} = :xmerl_scan.string(doc, options)
     parsed_doc
   end
-  def parse(doc_enum, options) do
+  def do_parse(doc_enum, options) do
     {parsed_doc, _} = :xmerl_scan.string('', options ++ continuation_opts(doc_enum))
     parsed_doc
   end
