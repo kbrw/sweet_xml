@@ -227,7 +227,8 @@ defmodule SweetXml do
   """
   def parse(doc, opts \\ []) do
     ets = :ets.new(nil, [])
-    {dtd_arg, opts} = Keyword.pop(opts, :dtd, :all)
+    dtd_arg = :proplists.get_value(:dtd, opts, :all)
+    opts = :proplists.delete(:dtd, opts)
     opts = SweetXml.Options.handle_dtd(dtd_arg).(ets) ++ opts
     try do
       do_parse(doc, opts)
@@ -298,10 +299,9 @@ defmodule SweetXml do
   def stream_tags(doc, tags, options \\ []) do
     tags = if is_atom(tags), do: [tags], else: tags
 
-    {discard_tags, xmerl_options} = if options[:discard] do
-      {options[:discard], Keyword.delete(options, :discard)}
-    else
-      {[], options}
+    {discard_tags, xmerl_options} = case :proplists.lookup(:discard, options) do
+      {:discard, tags} -> {tags, :proplists.delete(:discard, options)}
+      :none -> {[], options}
     end
 
     doc |> stream(fn emit ->
@@ -369,12 +369,18 @@ defmodule SweetXml do
     Stream.resource fn ->
       {parent, ref} = waiter = {self(), make_ref()}
       opts = options_callback.(fn e -> send(parent, {:event, ref, e}) end)
+
+      ets = :ets.new(nil, [:public])
+      dtd_arg = :proplists.get_value(:dtd, opts, :all)
+      opts = :proplists.delete(:dtd, opts)
+      opts = SweetXml.Options.handle_dtd(dtd_arg).(ets) ++ opts
+
       pid = spawn_link fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
-      {ref, pid, Process.monitor(pid)}
-    end, fn {ref, pid, monref} = acc ->
+      {ref, pid, Process.monitor(pid), ets}
+    end, fn {ref, pid, monref, ets} = acc ->
       receive do
         {:DOWN, ^monref, _, _, _} ->
-          {:halt, :parse_ended} ## !!! maybe do something when reason !== :normal
+          {:halt, {:parse_ended, ets}} ## !!! maybe do something when reason !== :normal
         {:event, ^ref, event} ->
           {[event], acc}
         {:wait, ^ref} ->
@@ -382,9 +388,13 @@ defmodule SweetXml do
           {[], acc}
       end
     end, fn
-      :parse_ended -> :ok
-      {ref, pid, monref} ->
+      {:parse_ended, ets} ->
+        _ = :ets.delete(ets)
+        :ok
+
+      {ref, pid, monref, ets} ->
         Process.demonitor(monref)
+        _ = :ets.delete(ets)
         flush_halt(pid, ref)
     end
   end

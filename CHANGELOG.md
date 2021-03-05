@@ -6,6 +6,10 @@
 
 * Improvement on the doc
 
+### ADDED
+
+* Added option to raise on DTD definitions
+
 ## [0.6.6] (2019-02-24)
 
 * small bugfix: Fix compilation warnings on newer versions of Elixir
