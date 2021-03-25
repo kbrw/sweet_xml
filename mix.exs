@@ -1,12 +1,12 @@
 defmodule SweetXml.Mixfile do
   use Mix.Project
 
-  @source_url "https://github.com/awetzel/sweet_xml"
+  @source_url "https://github.com/kbrw/sweet_xml"
 
   def project do
     [
       app: :sweet_xml,
-      version: "0.6.6",
+      version: "0.7.0-rc.1",
       elixir: "~> 1.0",
       description: "An sweet wrapper of :xmerl to help query XML docs",
       deps: deps(),

@@ -1,4 +1,5 @@
 defmodule SweetXpath do
+  @moduledoc false
 
   defmodule Priv do
     @moduledoc false
@@ -115,20 +116,34 @@ defmodule SweetXml do
   """
 
   require Record
+  @doc false
   Record.defrecord :xmlDecl, Record.extract(:xmlDecl, from_lib: "xmerl/include/xmerl.hrl")
+  @doc false
   Record.defrecord :xmlAttribute, Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl")
+  @doc false
   Record.defrecord :xmlNamespace, Record.extract(:xmlNamespace, from_lib: "xmerl/include/xmerl.hrl")
+  @doc false
   Record.defrecord :xmlNsNode, Record.extract(:xmlNsNode, from_lib: "xmerl/include/xmerl.hrl")
+  @doc false
   Record.defrecord :xmlElement, Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl")
+  @doc false
   Record.defrecord :xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl")
+  @doc false
   Record.defrecord :xmlComment, Record.extract(:xmlComment, from_lib: "xmerl/include/xmerl.hrl")
+  @doc false
   Record.defrecord :xmlPI, Record.extract(:xmlPI, from_lib: "xmerl/include/xmerl.hrl")
+  @doc false
   Record.defrecord :xmlDocument, Record.extract(:xmlDocument, from_lib: "xmerl/include/xmerl.hrl")
+  @doc false
   Record.defrecord :xmlObj, Record.extract(:xmlObj, from_lib: "xmerl/include/xmerl.hrl")
+
+  @type doc :: (iodata | String.t | Enum.t)
+  @type spec :: %SweetXpath{}
+  @opaque xmlElement :: record(:xmlElement)
 
 
   @doc ~s"""
-  `sigil_x/2` simply returns a `SweetXpath` struct, with modifiers converted to
+  `sigil_x/2` simply returns a `%SweetXpath{}` struct, with modifiers converted to
   boolean fields:
 
       iex> SweetXml.sigil_x("//some/path", 'e')
@@ -211,20 +226,31 @@ defmodule SweetXml do
                                      | xpath.namespaces]}
   end
 
-@doc """
+  @doc """
+  Parse a document into a form ready to be used by `xpath/3` and `xmap/2`.
+
   `doc` can be
 
   - a byte list (iodata)
   - a binary
   - any enumerable of binaries (for instance `File.stream!/3` result)
 
-  `options` are `xmerl` options described here [http://www.erlang.org/doc/man/xmerl_scan.html](http://www.erlang.org/doc/man/xmerl_scan.html),
-  see [the erlang tutorial](http://www.erlang.org/doc/apps/xmerl/xmerl_examples.html) for usage.
+  `options` can be both:
+  * `xmerl`'s options as described on the [xmerl_scan](http://www.erlang.org/doc/man/xmerl_scan.html) documentation page,
+    see [the erlang tutorial](http://www.erlang.org/doc/apps/xmerl/xmerl_examples.html) for some advanced usage.
+      For example: `parse(doc, quiet: true)`
+  * `:dtd` to prevent DTD parsing or fetching, with the following possibilities:
+    * `:none`, will prevent both internal and external entities, it is the recommended options on untrusted XML;
+    * `:all`, the default, for backward compatibility, allows all DTDs;
+    * `:internal_only`, will block all attempt at external fetching;
+    * `[only: entities]` where `entities` is either an atom for a single entity, or a list of atoms.
+      If any other entity is defined in the XML, `parse` will raise on them.
 
   When `doc` is an enumerable, the `:cont_fun` option cannot be given.
 
   Returns an `xmlElement` record.
   """
+  @spec parse(doc, opts :: list) :: xmlElement
   def parse(doc, opts \\ []) do
     ets = :ets.new(nil, [])
     dtd_arg = :proplists.get_value(:dtd, opts, :all)
@@ -264,6 +290,7 @@ defmodule SweetXml do
     will be `{:tagname, xmlelem}`. e.g. :li, :header
   - `options[:discard]` is the list of tag which will be discarded:
      not added to its parent DOM.
+  - More options details are available with `parse/2`.
 
   ## Examples
 
@@ -338,9 +365,9 @@ defmodule SweetXml do
 
   - `doc` is an enumerable, data will be pulled during the result stream
     enumeration. e.g. `File.stream!("some_file.xml")`
-  - `options_callback` is an anonymous function `fn emit -> xmerl_opts` use it to
+  - `options_callback` is an anonymous function `fn emit -> (xmerl_opts | opts)` use it to
     define your :xmerl callbacks and put data into the stream using
-    `emit.(elem)` in the callbacks.
+    `emit.(elem)` in the callbacks. More details are available with `parse/2`.
 
   For example, here you define a stream of all `xmlElement` :
 
@@ -400,12 +427,12 @@ defmodule SweetXml do
   end
 
   @doc ~S"""
-  `xpath` allows you to query an XML document with xpath.
+  `xpath` allows you to query an XML document with XPath.
 
-  The second argument to xpath is a `SweetXpath` struct. The optional third
+  The second argument to xpath is a `%SweetXpath{}` struct. The optional third
   argument is a keyword list, such that the value of each keyword is also
-  either a `SweetXpath` or a list with head being a `SweetXpath` and tail being
-  another keyword list exactly like before. Please see examples below for better
+  either a `%SweetXpath{}` or a list with head being a `%SweetXpath{}` and tail being
+  another keyword list exactly like before. Please see the examples below for better
   understanding.
 
   ## Examples
@@ -438,20 +465,37 @@ defmodule SweetXml do
       ...>    )
       %{ul: %{a: 'Two'}}
 
+  ## Security
+
+  Whenever you are working with some xml that was not generated by your system,
+  it is highly recommended that you restrain some functionalities of XML
+  during the parsing. SweetXml allows in particular to prevent DTD parsing and fetching.
+  Unless you know exactly what kind of DTD you want to permit in your xml,
+  it is recommended that you use the following code example to prevent possible attacks:
+  ```
+  doc
+  |> parse(dtd: :none)
+  |> xpath(spec, subspec)
+  ```
+  For more details, see `parse/2`.
   """
-  def xpath(parent, spec) when not is_tuple(parent) do
+  @spec xpath(parent :: (doc | xmlElement), spec, subspec) :: any
+  when subspec: keyword(spec | subspec)
+  def xpath(parent, spec, subspec \\ [])
+
+  def xpath(parent, spec, []) when not is_tuple(parent) do
     parent |> parse |> xpath(spec)
   end
 
-  def xpath(parent, %SweetXpath{is_list: true, is_value: true, cast_to: cast, is_optional: is_opt?} = spec) do
+  def xpath(parent, %SweetXpath{is_list: true, is_value: true, cast_to: cast, is_optional: is_opt?} = spec, []) do
     get_current_entities(parent, spec) |> Enum.map(&(_value(&1)) |> to_cast(cast,is_opt?)) |> spec.transform_fun.()
   end
 
-  def xpath(parent, %SweetXpath{is_list: true, is_value: false} = spec) do
+  def xpath(parent, %SweetXpath{is_list: true, is_value: false} = spec, []) do
     get_current_entities(parent, spec) |> spec.transform_fun.()
   end
 
-  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: string_type, is_optional: is_opt?} = spec) when string_type in [:string,:soft_string] do
+  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: string_type, is_optional: is_opt?} = spec, []) when string_type in [:string,:soft_string] do
     spec = %SweetXpath{spec | is_list: true}
     get_current_entities(parent, spec)
     |> Enum.map(&(_value(&1) |> to_cast(string_type, is_opt?)))
@@ -459,11 +503,11 @@ defmodule SweetXml do
     |> spec.transform_fun.()
   end
 
-  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: cast, is_optional: is_opt?} = spec) do
+  def xpath(parent, %SweetXpath{is_list: false, is_value: true, cast_to: cast, is_optional: is_opt?} = spec, []) do
     get_current_entities(parent, spec) |> _value |> to_cast(cast, is_opt?) |> spec.transform_fun.()
   end
 
-  def xpath(parent, %SweetXpath{is_list: false, is_value: false} = spec) do
+  def xpath(parent, %SweetXpath{is_list: false, is_value: false} = spec, []) do
     get_current_entities(parent, spec) |> spec.transform_fun.()
   end
 
@@ -478,10 +522,12 @@ defmodule SweetXml do
   end
 
   @doc ~S"""
-  `xmap` returns a mapping with each value being the result of `xpath`
+  `xmap` returns a mapping with each value being the result of `xpath`.
 
-  Just as `xpath`, you can nest the mapping structure. Please see `xpath` for
+  Just as `xpath`, you can nest the mapping structure. Please see `xpath/3` for
   more detail.
+
+  You can give the option `true` to get the result as a keyword list instead of a map.
 
   ## Examples
 
@@ -530,8 +576,24 @@ defmodule SweetXml do
       ...>      ]
       ...>    ], true)
       [message: 'Message', ul: %{a: 'Two'}]
+
+  ## Security
+
+  Whenever you are working with some xml that was not generated by your system,
+  it is highly recommended that you restrain some functionalities of XML
+  during the parsing. SweetXml allows in particular to prevent DTD parsing and fetching.
+  Unless you know exactly what kind of DTD you want to permit in your xml,
+  it is recommended that you use the following code example to prevent possible attacks:
+  ```
+  doc
+  |> parse(dtd: :none)
+  |> xmap(specs, options)
+  ```
+  For more details, see `parse/2`.
   """
-  def xmap(parent, mapping), do: xmap(parent, mapping, %{is_keyword: false})
+  @spec xmap(parent :: (doc | xmlElement), mapping :: specs, options :: (boolean | map)) :: (map | keyword)
+  when specs: keyword(spec | specs)
+  def xmap(parent, mapping, options \\ false)
 
   def xmap(nil, _, %{is_optional: true}), do: nil
 

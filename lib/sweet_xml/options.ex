@@ -1,4 +1,6 @@
 defmodule SweetXml.Options do
+  @moduledoc false
+
   def handle_dtd(:all) do
     fn _ -> [] end
   end
