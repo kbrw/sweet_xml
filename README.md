@@ -21,6 +21,9 @@ def deps do
 end
 ```
 
+`SweetXml` depends on `:xmerl`. On some Linux systems, you might need
+to install the package `erlang-xmerl`.
+
 ## Examples
 
 Given an XML document such as below:
