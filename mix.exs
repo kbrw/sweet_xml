@@ -6,7 +6,7 @@ defmodule SweetXml.Mixfile do
   def project do
     [
       app: :sweet_xml,
-      version: "0.7.0-rc.1",
+      version: "0.7.0",
       elixir: "~> 1.0",
       description: "An sweet wrapper of :xmerl to help query XML docs",
       deps: deps(),
