@@ -139,7 +139,7 @@ defmodule SweetXml do
 
   @type doc :: (iodata | String.t | Enum.t)
   @type spec :: %SweetXpath{}
-  @opaque xmlElement :: record(:xmlElement)
+  @type xmlElement :: record(:xmlElement)
 
 
   @doc ~s"""
