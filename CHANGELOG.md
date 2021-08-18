@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+* [@J3RN](https://github.com/J3RN) noticed a breaking change due to the introduction of an opaque type  
+  Changed `xmlElement` from `@opaque` to `@type`
+
 ## [0.7.0] (2021-07-02)
 
 ### Changed
@@ -74,6 +81,10 @@
 * Added support for scalar values (xbrukner)
 
 ## [0.1.1]
+
+---
+
+Changelog format inspired by [keep-a-changelog](https://github.com/olivierlacan/keep-a-changelog)
 
 [unreleased]: https://github.com/kbrw/sweet_xml/compare/0.7.0...HEAD
 
