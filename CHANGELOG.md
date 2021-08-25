@@ -86,9 +86,9 @@
 
 Changelog format inspired by [keep-a-changelog](https://github.com/olivierlacan/keep-a-changelog)
 
-[unreleased]: https://github.com/kbrw/sweet_xml/compare/0.7.0...HEAD
+[unreleased]: https://github.com/kbrw/sweet_xml/compare/v0.7.0...HEAD
 
-[0.7.0]: https://github.com/kbrw/sweet_xml/compare/0.6.6...0.7.0
+[0.7.0]: https://github.com/kbrw/sweet_xml/compare/0.6.6...v0.7.0
 [0.6.6]: https://github.com/kbrw/sweet_xml/compare/0.6.5...0.6.6
 [0.6.5]: https://github.com/kbrw/sweet_xml/compare/0.6.4...0.6.5
 [0.6.4]: https://github.com/kbrw/sweet_xml/compare/0.6.3...0.6.4
