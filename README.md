@@ -17,7 +17,7 @@ Add dependency to your project's `mix.exs`:
 
 ```elixir
 def deps do
-  [{:sweet_xml, "~> 0.7.0"}]
+  [{:sweet_xml, "~> 0.7.1"}]
 end
 ```
 
