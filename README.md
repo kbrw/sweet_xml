@@ -164,6 +164,8 @@ assert result == %{
 
 ## The ~x Sigil
 
+Warning ! Because we use `xmerl` internally, only XPath 1.0 paths are handled.
+
 In the above examples, we used the expression `~x"//some/path"` to
 define the path. The reason is it allows us to more precisely specify what
 is being returned.

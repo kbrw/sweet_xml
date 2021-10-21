@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+* Improvement on the doc, notably warning that only XPath 1.0 queries are handled.
+
 ## [0.7.1] (2021-08-25)
 
 ### Changed
