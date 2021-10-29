@@ -485,3 +485,9 @@ enum |> stream_tags(tags, dtd: :none)
 Copyright (c) 2014, Frank Liu
 
 SweetXml source code is licensed under the [MIT License](https://github.com/kbrw/sweet_xml/blob/master/LICENSE).
+
+# CONTRIBUTING
+
+Hi, and thank you for wanting to contribute.
+Please refer to the centralized informations available at: https://github.com/kbrw#contributing
+
