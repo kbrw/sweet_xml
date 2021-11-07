@@ -70,4 +70,41 @@ defmodule SweetXmlStreamTest do
     assert result == ['Nested Head', 'XML Parsing']
   end
 
+  describe "stream_tags!/2" do
+    test "streaming tags", %{simple_stream: simple_stream} do
+      result =
+        simple_stream
+        |> stream_tags([:li, :special_match_key], discard: [:li, :special_match_key])
+        |> Stream.map(fn {_, doc} -> xpath(doc, ~x"./text()") end)
+        |> Enum.to_list
+
+      assert result == ['\n        First', 'Second\n      ', 'Third', 'Forth', 'first star']
+
+      result =
+        simple_stream
+        |> stream_tags(:head)
+        |> Stream.map(fn {_, doc} -> xpath(doc, ~x"./title/text()") end)
+        |> Enum.to_list
+
+      assert result == ['Nested Head', 'XML Parsing']
+    end
+
+    test "invalid xml" do
+      assert_raise SweetXml.XmerlFatal, ":error_scanning_entity_ref", fn ->
+        "test/files/invalid.xml"
+        |> File.stream!()
+        |> SweetXml.stream_tags!(:matchup, quiet: true)
+        |> Stream.run()
+      end
+    end
+
+    test "DTD error" do
+      assert_raise SweetXml.DTDError, "DTD not allowed: lol1", fn ->
+        "test/files/billion_laugh.xml"
+        |> File.stream!()
+        |> SweetXml.stream_tags!(:banana, dtd: :none, quiet: true)
+        |> Stream.run()
+      end
+    end
+  end
 end

@@ -2,15 +2,15 @@ defmodule SweetXml.Options do
   @moduledoc false
 
   def handle_dtd(:all) do
-    fn _ -> [] end
+    fn _, _ -> [] end
   end
   def handle_dtd(:none) do
-    fn ets ->
-      handle_dtd(:internal_only).(ets) ++ handle_dtd(only: []).(ets)
+    fn ets, exception_module ->
+      handle_dtd(:internal_only).(ets, exception_module) ++ handle_dtd(only: []).(ets, exception_module)
     end
   end
   def handle_dtd(:internal_only) do
-    fn _ ->
+    fn _, _ ->
       [fetch_fun: fn _, _ -> {:error, "no external entity allowed"} end]
     end
   end
@@ -18,7 +18,7 @@ defmodule SweetXml.Options do
     handle_dtd(only: [entity])
   end
   def handle_dtd(only: entities) when is_list(entities) do
-    fn ets ->
+    fn ets, exception_module ->
       read = fn
         context, name, state ->
           ets = :xmerl_scan.rules_state(state)
@@ -37,7 +37,8 @@ defmodule SweetXml.Options do
                   [] -> :ets.insert(ets, {{context, name}, value})
                   _ -> :ok
                 end
-              false -> raise("DTD not allowed: #{name}")
+              false ->
+                raise exception_module, message: "DTD not allowed: #{name}"
             end
             state
 

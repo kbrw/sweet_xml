@@ -143,6 +143,18 @@ defmodule SweetXml do
   @type spec :: %SweetXpath{}
   @type xmlElement :: record(:xmlElement)
 
+  defmodule XmerlFatal do
+    defexception [:message, :reason, :file, :line, :col]
+
+    @impl Exception
+    def exception({reason, {:file, file}, {:line, line}, {:col ,col}}) do
+      %__MODULE__{reason: reason, file: file, line: line, col: col, message: inspect(reason)}
+    end
+  end
+
+  defmodule DTDError do
+    defexception [:message]
+  end
 
   @doc ~s"""
   `sigil_x/2` simply returns a `%SweetXpath{}` struct, with modifiers converted to
@@ -257,7 +269,7 @@ defmodule SweetXml do
     ets = :ets.new(nil, [])
     dtd_arg = :proplists.get_value(:dtd, opts, :all)
     opts = :proplists.delete(:dtd, opts)
-    opts = SweetXml.Options.handle_dtd(dtd_arg).(ets) ++ opts
+    opts = SweetXml.Options.handle_dtd(dtd_arg).(ets, RuntimeError) ++ opts
     try do
       do_parse(doc, opts)
     after
@@ -359,6 +371,40 @@ defmodule SweetXml do
     end)
   end
 
+  def stream_tags!(doc, tags, options \\ []) do
+    tags = if is_atom(tags), do: [tags], else: tags
+
+    {discard_tags, xmerl_options} = case :proplists.lookup(:discard, options) do
+      {:discard, tags} -> {tags, :proplists.delete(:discard, options)}
+      :none -> {[], options}
+    end
+
+    doc |> stream!(fn emit ->
+      [
+        hook_fun: fn
+          entity, xstate when Record.is_record(entity, :xmlElement) ->
+            name = xmlElement(entity, :name)
+            if length(tags) == 0 or name in tags do
+              emit.({name, entity})
+            end
+            {entity, xstate}
+          entity, xstate ->
+            {entity, xstate}
+        end,
+        acc_fun: fn
+          entity, acc, xstate when Record.is_record(entity, :xmlElement) ->
+            if xmlElement(entity, :name) in discard_tags do
+              {acc, xstate}
+            else
+              {[entity | acc], xstate}
+            end
+          entity, acc, xstate ->
+            {[entity | acc], xstate}
+        end
+      ] ++ xmerl_options
+    end)
+  end
+
   @doc """
   Create an element stream from a XML `doc`.
 
@@ -402,7 +448,7 @@ defmodule SweetXml do
       ets = :ets.new(nil, [:public])
       dtd_arg = :proplists.get_value(:dtd, opts, :all)
       opts = :proplists.delete(:dtd, opts)
-      opts = SweetXml.Options.handle_dtd(dtd_arg).(ets) ++ opts
+      opts = SweetXml.Options.handle_dtd(dtd_arg).(ets, RuntimeError) ++ opts
 
       pid = spawn_link fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
       {ref, pid, Process.monitor(pid), ets}
@@ -420,6 +466,58 @@ defmodule SweetXml do
       {:parse_ended, ets} ->
         _ = :ets.delete(ets)
         :ok
+
+      {ref, pid, monref, ets} ->
+        Process.demonitor(monref)
+        _ = :ets.delete(ets)
+        flush_halt(pid, ref)
+    end
+  end
+
+  def stream!(doc, options_callback) when is_binary(doc) do
+    stream!([doc], options_callback)
+  end
+  def stream!([c | _] = doc, options_callback) when is_integer(c) do
+    stream([IO.iodata_to_binary(doc)], options_callback)
+  end
+  def stream!(doc, options_callback) do
+    Stream.resource fn ->
+      {parent, ref} = waiter = {self(), make_ref()}
+      opts = options_callback.(fn e -> send(parent, {:event, ref, e}) end)
+
+      ets = :ets.new(nil, [:public])
+      dtd_arg = :proplists.get_value(:dtd, opts, :all)
+      opts = :proplists.delete(:dtd, opts)
+      opts = SweetXml.Options.handle_dtd(dtd_arg).(ets, SweetXml.DTDError) ++ opts
+
+      {pid, monref} = spawn_monitor fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
+      {ref, pid, monref, ets}
+    end, fn {ref, pid, monref, ets} = acc ->
+      receive do
+        {:DOWN, ^monref, :process, ^pid, :normal} ->
+          {:halt, {:parse_ended, ets}}
+        {:DOWN, ^monref, :process, ^pid, {:fatal, error}} ->
+          {:halt, {:fatal, error, ets}}
+        {:DOWN, ^monref, :process, ^pid, error} ->
+          {:halt, {:error, error, ets}}
+        {:event, ^ref, event} ->
+          {[event], acc}
+        {:wait, ^ref} ->
+          send(pid, {:continue, ref})
+          {[], acc}
+      end
+    end, fn
+      {:parse_ended, ets} ->
+        _ = :ets.delete(ets)
+        :ok
+
+      {:fatal, error, ets} ->
+        _ = :ets.delete(ets)
+        raise SweetXml.XmerlFatal, error
+
+      {:error, {exception, stacktrace}, ets} ->
+        _ = :ets.delete(ets)
+        reraise(exception, stacktrace)
 
       {ref, pid, monref, ets} ->
         Process.demonitor(monref)
