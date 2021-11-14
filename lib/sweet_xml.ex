@@ -17,6 +17,20 @@ defmodule SweetXpath do
     namespaces: []
 end
 
+defmodule SweetXml.XmerlFatal do
+  defexception [:message, :reason, :file, :line, :col]
+
+  @impl Exception
+  def exception({reason, {:file, file}, {:line, line}, {:col ,col}}) do
+    %__MODULE__{reason: reason, file: file, line: line, col: col, message: inspect(reason)}
+  end
+end
+
+defmodule SweetXml.DTDError do
+  defexception [:message]
+end
+
+
 defmodule SweetXml do
   @moduledoc ~S"""
   `SweetXml` is a thin wrapper around `:xmerl`. It allows you to convert a
@@ -143,19 +157,6 @@ defmodule SweetXml do
   @type spec :: %SweetXpath{}
   @type xmlElement :: record(:xmlElement)
 
-  defmodule XmerlFatal do
-    defexception [:message, :reason, :file, :line, :col]
-
-    @impl Exception
-    def exception({reason, {:file, file}, {:line, line}, {:col ,col}}) do
-      %__MODULE__{reason: reason, file: file, line: line, col: col, message: inspect(reason)}
-    end
-  end
-
-  defmodule DTDError do
-    defexception [:message]
-  end
-
   @doc ~s"""
   `sigil_x/2` simply returns a `%SweetXpath{}` struct, with modifiers converted to
   boolean fields:
@@ -269,7 +270,7 @@ defmodule SweetXml do
     ets = :ets.new(nil, [])
     dtd_arg = :proplists.get_value(:dtd, opts, :all)
     opts = :proplists.delete(:dtd, opts)
-    opts = SweetXml.Options.handle_dtd(dtd_arg).(ets, RuntimeError) ++ opts
+    opts = SweetXml.Options.handle_dtd(dtd_arg).(ets) ++ opts
     try do
       do_parse(doc, opts)
     after
@@ -448,7 +449,7 @@ defmodule SweetXml do
       ets = :ets.new(nil, [:public])
       dtd_arg = :proplists.get_value(:dtd, opts, :all)
       opts = :proplists.delete(:dtd, opts)
-      opts = SweetXml.Options.handle_dtd(dtd_arg).(ets, RuntimeError) ++ opts
+      opts = SweetXml.Options.handle_dtd(dtd_arg).(ets) ++ opts
 
       pid = spawn_link fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
       {ref, pid, Process.monitor(pid), ets}
@@ -488,7 +489,7 @@ defmodule SweetXml do
       ets = :ets.new(nil, [:public])
       dtd_arg = :proplists.get_value(:dtd, opts, :all)
       opts = :proplists.delete(:dtd, opts)
-      opts = SweetXml.Options.handle_dtd(dtd_arg).(ets, SweetXml.DTDError) ++ opts
+      opts = SweetXml.Options.handle_dtd(dtd_arg, SweetXml.DTDError).(ets) ++ opts
 
       {pid, monref} = spawn_monitor fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
       {ref, pid, monref, ets}

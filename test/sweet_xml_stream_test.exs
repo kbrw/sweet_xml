@@ -106,5 +106,14 @@ defmodule SweetXmlStreamTest do
         |> Stream.run()
       end
     end
+
+    test "internal only" do
+      assert_raise SweetXml.DTDError, "no external entity allowed", fn ->
+        "test/files/xxe.xml"
+        |> File.stream!()
+        |> SweetXml.stream_tags!(:result, dtd: :internal_only)
+        |> Stream.run
+      end
+    end
   end
 end
