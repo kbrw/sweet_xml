@@ -1,7 +1,7 @@
 defmodule SweetXml.Mixfile do
   use Mix.Project
 
-  def version, do: "0.7.1"
+  def version, do: "0.7.2"
 
   @source_url "https://github.com/kbrw/sweet_xml"
 

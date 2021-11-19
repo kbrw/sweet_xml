@@ -6,6 +6,11 @@
 
 * Improvement on the doc, notably warning that only XPath 1.0 queries are handled.
 
+### Added
+
+* Contribution from [@tank-bohr](https://github.com/github/tank-bohr): Added strict stream API with a more coherent overall behavior, and easier to handle failure behavior:
+  `stream!/2` and `stream_tags!/2,3` are now available.
+
 ## [0.7.1] (2021-08-25)
 
 ### Changed
@@ -19,7 +24,7 @@
 
 * Improvement on the doc
 
-### ADDED
+### Added
 
 * Added option to raise on DTD definitions
 
