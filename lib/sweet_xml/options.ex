@@ -1,23 +1,32 @@
 defmodule SweetXml.Options do
   @moduledoc false
 
-  def handle_dtd(:all) do
+  def handle_dtd(dtd_option, exception_module \\ RuntimeError)
+
+  def handle_dtd(:all, _exception_module) do
     fn _ -> [] end
   end
-  def handle_dtd(:none) do
+  def handle_dtd(:none, exception_module) do
     fn ets ->
-      handle_dtd(:internal_only).(ets) ++ handle_dtd(only: []).(ets)
+      handle_dtd(:internal_only, exception_module).(ets) ++ handle_dtd([only: []], exception_module).(ets)
     end
   end
-  def handle_dtd(:internal_only) do
-    fn _ ->
-      [fetch_fun: fn _, _ -> {:error, "no external entity allowed"} end]
+  def handle_dtd(:internal_only, exception_module) do
+    case exception_module do
+      SweetXml.DTDError ->
+        fn _ ->
+          [fetch_fun: fn _, _ -> raise SweetXml.DTDError, message: "no external entity allowed" end]
+        end
+      _ ->
+        fn _ ->
+          [fetch_fun: fn _, _ -> {:error, "no external entity allowed"} end]
+        end
     end
   end
-  def handle_dtd(only: entity) when is_atom(entity) do
-    handle_dtd(only: [entity])
+  def handle_dtd([only: entity], exception_module) when is_atom(entity) do
+    handle_dtd([only: [entity]], exception_module)
   end
-  def handle_dtd(only: entities) when is_list(entities) do
+  def handle_dtd([only: entities], exception_module) when is_list(entities) do
     fn ets ->
       read = fn
         context, name, state ->
@@ -37,7 +46,8 @@ defmodule SweetXml.Options do
                   [] -> :ets.insert(ets, {{context, name}, value})
                   _ -> :ok
                 end
-              false -> raise("DTD not allowed: #{name}")
+              false ->
+                raise exception_module, message: "DTD not allowed: #{name}"
             end
             state
 
