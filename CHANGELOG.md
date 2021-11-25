@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.7.2] (2021-11-25)
+
 ### Changed
 
 * Improvement on the doc, notably warning that only XPath 1.0 queries are handled.
@@ -97,8 +99,9 @@
 
 Changelog format inspired by [keep-a-changelog](https://github.com/olivierlacan/keep-a-changelog)
 
-[unreleased]: https://github.com/kbrw/sweet_xml/compare/v0.7.1...HEAD
+[unreleased]: https://github.com/kbrw/sweet_xml/compare/v0.7.2...HEAD
 
+[0.7.2]: https://github.com/kbrw/sweet_xml/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/kbrw/sweet_xml/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/kbrw/sweet_xml/compare/0.6.6...v0.7.0
 [0.6.6]: https://github.com/kbrw/sweet_xml/compare/0.6.5...0.6.6
