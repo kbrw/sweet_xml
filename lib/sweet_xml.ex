@@ -18,6 +18,9 @@ defmodule SweetXpath do
 end
 
 defmodule SweetXml.XmerlFatal do
+  @moduledoc """
+  An error raised when xmerl exits with a fatal error.
+  """
   defexception [:message, :reason, :file, :line, :col]
 
   @impl Exception
@@ -27,6 +30,9 @@ defmodule SweetXml.XmerlFatal do
 end
 
 defmodule SweetXml.DTDError do
+  @moduledoc """
+  An error raised when a non allowed DTD is encountered.
+  """
   defexception [:message]
 end
 
@@ -292,6 +298,8 @@ defmodule SweetXml do
   end
 
   @doc """
+  Will be later deprecated in favor of `stream_tags!/3`.
+
   Most common usage of streaming: stream a given tag or a list of tags, and
   optionally "discard" some DOM elements in order to free memory during streaming
   for big files which cannot fit entirely in memory.
@@ -372,6 +380,12 @@ defmodule SweetXml do
     end)
   end
 
+  @doc """
+  Equivalent to `stream_tags/3`, see `stream_tags/3` for more details.
+  The difference is in the handling of the errors. The caller can use `try/1`,
+  whereas with `stream_tags/3` trapping exits and handling messages was necessary.
+  May raise `SweetXml.XmerlFatal` or `SweetXml.DTDError`.
+  """
   def stream_tags!(doc, tags, options \\ []) do
     tags = if is_atom(tags), do: [tags], else: tags
 
@@ -407,6 +421,8 @@ defmodule SweetXml do
   end
 
   @doc """
+  Will be later deprecated in favor of `stream!/2`.
+
   Create an element stream from a XML `doc`.
 
   This is a lower level API compared to `SweetXml.stream_tags`. You can use
@@ -475,6 +491,12 @@ defmodule SweetXml do
     end
   end
 
+  @doc """
+  Equivalent to `stream/2`, see `stream/2` for more details.
+  The difference is in the handling of the errors. The caller can use `try/1`,
+  whereas with `stream/3` trapping exits and handling messages was necessary.
+  May raise `SweetXml.XmerlFatal` or `SweetXml.DTDError`.
+  """
   def stream!(doc, options_callback) when is_binary(doc) do
     stream!([doc], options_callback)
   end
