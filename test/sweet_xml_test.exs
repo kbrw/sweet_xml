@@ -46,7 +46,7 @@ defmodule SweetXmlTest do
     assert ~x"//header/text()"li == %SweetXpath{path: '//header/text()', is_value: true, is_list: true, is_keyword: false, cast_to: :integer}
   end
 
-  test "xpath with sweet_xpath as only argment", %{simple: doc} do
+  test "xpath with sweet_xpath as only argument", %{simple: doc} do
     result = doc |> xpath(~x"//header/text()"e)
     assert xmlText(result, :value) == 'Content Header'
 
@@ -310,7 +310,7 @@ defmodule SweetXmlTest do
     result = readme |> xpath(~x"//matchup/name/text()") # `x` marks sigil for (x)path
     assert result == 'Match One'
 
-    # get the xml record of the name fo the first match
+    # get the xml record of the name of the first match
     result = readme |> xpath(~x"//matchup/name"e) # `e` is the modifier for (e)ntity
     assert elem(result, 0) == :xmlElement
 
