@@ -1,4 +1,7 @@
 defmodule SweetXml.Options do
+  ### WARNING:
+  # This is an intenal api, use at your own risk.
+
   @moduledoc false
 
   def handle_dtd(dtd_option, exception_module \\ RuntimeError)

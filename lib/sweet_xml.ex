@@ -261,11 +261,13 @@ defmodule SweetXml do
     see [the erlang tutorial](http://www.erlang.org/doc/apps/xmerl/xmerl_examples.html) for some advanced usage.
       For example: `parse(doc, quiet: true)`
   * `:dtd` to prevent DTD parsing or fetching, with the following possibilities:
-    * `:none`, will prevent both internal and external entities, it is the recommended options on untrusted XML;
+    * `:none`, will prevent both internal and external entities, it is the recommended options on untrusted XML.
+      This will override the option `{:rules, read_fun, write_fun, state}` if present;
     * `:all`, the default, for backward compatibility, allows all DTDs;
     * `:internal_only`, will block all attempt at external fetching;
     * `[only: entities]` where `entities` is either an atom for a single entity, or a list of atoms.
       If any other entity is defined in the XML, `parse` will raise on them.
+      This will override the option `{:rules, read_fun, write_fun, state}` if present.
 
   When `doc` is an enumerable, the `:cont_fun` option cannot be given.
 
@@ -273,14 +275,39 @@ defmodule SweetXml do
   """
   @spec parse(doc, opts :: list) :: xmlElement
   def parse(doc, opts \\ []) do
-    ets = :ets.new(nil, [])
     dtd_arg = :proplists.get_value(:dtd, opts, :all)
     opts = :proplists.delete(:dtd, opts)
-    opts = SweetXml.Options.handle_dtd(dtd_arg).(ets) ++ opts
+
+    {opts, do_after} = case :proplists.split(opts, [:rules]) do
+      {[[]], opts} ->
+        ets = :ets.new(nil, [])
+        opts = opts ++ SweetXml.Options.handle_dtd(dtd_arg).(ets)
+        {opts, {:cleanup, ets}}
+
+      {[[{:rules, ets}] = rules], opts} ->
+        opts = rules ++ opts ++ SweetXml.Options.handle_dtd(dtd_arg).(ets)
+        {opts, :not_ours}
+
+      {[[{:rules, _read_fun, _write_fun, _ets}]], opts} ->
+        ets = :ets.new(nil, [])
+        dtd_opts = SweetXml.Options.handle_dtd(dtd_arg).(ets)
+        _ = case :proplists.split(dtd_opts, [:rules]) do
+          {[], _opts} -> :ok
+          {[_], _opts} ->
+            require Logger
+            _ = Logger.warn("rules opt will be overriden because of the dtd option")
+            :warned
+        end
+        {opts ++ dtd_opts, {:cleanup, ets}}
+    end
+
     try do
       do_parse(doc, opts)
     after
-      _ = :ets.delete(ets)
+      case do_after do
+        :not_ours -> :ok
+        {:cleanup, ets} -> :ets.delete(ets)
+      end
     end
   end
 
@@ -298,7 +325,7 @@ defmodule SweetXml do
   end
 
   @doc """
-  Will be later deprecated in favor of `stream_tags!/3`.
+  > Will be later deprecated in favor of `stream_tags!/3`.
 
   Most common usage of streaming: stream a given tag or a list of tags, and
   optionally "discard" some DOM elements in order to free memory during streaming
@@ -346,6 +373,7 @@ defmodule SweetXml do
       [nil, nil]
 
   """
+  # TODO : deprecate on version 0.10.0 (0.7.0 + 3)
   def stream_tags(doc, tags, options \\ []) do
     tags = if is_atom(tags), do: [tags], else: tags
 
@@ -421,7 +449,7 @@ defmodule SweetXml do
   end
 
   @doc """
-  Will be later deprecated in favor of `stream!/2`.
+  > Will be later deprecated in favor of `stream!/2`.
 
   Create an element stream from a XML `doc`.
 
@@ -451,6 +479,7 @@ defmodule SweetXml do
       ...> end) |> Enum.count
       3
   """
+  # TODO : deprecate on version 0.10.0 (0.7.0 + 3)
   def stream(doc, options_callback) when is_binary(doc) do
     stream([doc], options_callback)
   end
@@ -458,21 +487,46 @@ defmodule SweetXml do
     stream([IO.iodata_to_binary(doc)], options_callback)
   end
   def stream(doc, options_callback) do
+    do_after_go = fn
+      :not_ours -> :ok
+      {:cleanup, ets} -> :ets.delete(ets)
+    end
     Stream.resource fn ->
       {parent, ref} = waiter = {self(), make_ref()}
       opts = options_callback.(fn e -> send(parent, {:event, ref, e}) end)
 
-      ets = :ets.new(nil, [:public])
       dtd_arg = :proplists.get_value(:dtd, opts, :all)
       opts = :proplists.delete(:dtd, opts)
-      opts = SweetXml.Options.handle_dtd(dtd_arg).(ets) ++ opts
+
+      {opts, do_after} = case :proplists.split(opts, [:rules]) do
+        {[[]], opts} ->
+          ets = :ets.new(nil, [:public])
+          opts = opts ++ SweetXml.Options.handle_dtd(dtd_arg).(ets)
+          {opts, {:cleanup, ets}}
+
+        {[[{:rules, ets}] = rules], opts} ->
+          opts = rules ++ opts ++ SweetXml.Options.handle_dtd(dtd_arg).(ets)
+          {opts, :not_ours}
+
+        {[[{:rules, _read_fun, _write_fun, _ets}]], opts} ->
+          ets = :ets.new(nil, [:public])
+          dtd_opts = SweetXml.Options.handle_dtd(dtd_arg).(ets)
+          _ = case :proplists.split(dtd_opts, [:rules]) do
+            {[], _opts} -> :ok
+            {[_], _opts} ->
+              require Logger
+              _ = Logger.warn("rules opt will be overriden because of the dtd option")
+              :warned
+          end
+          {opts ++ dtd_opts, {:cleanup, ets}}
+      end
 
       pid = spawn_link fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
-      {ref, pid, Process.monitor(pid), ets}
-    end, fn {ref, pid, monref, ets} = acc ->
+      {ref, pid, Process.monitor(pid), do_after}
+    end, fn {ref, pid, monref, do_after} = acc ->
       receive do
-        {:DOWN, ^monref, _, _, _} ->
-          {:halt, {:parse_ended, ets}} ## !!! maybe do something when reason !== :normal
+        {:DOWN, ^monref, :process, ^pid, :normal} ->
+          {:halt, {:parse_ended, do_after}} ## !!! maybe do something when reason !== :normal
         {:event, ^ref, event} ->
           {[event], acc}
         {:wait, ^ref} ->
@@ -480,13 +534,13 @@ defmodule SweetXml do
           {[], acc}
       end
     end, fn
-      {:parse_ended, ets} ->
-        _ = :ets.delete(ets)
+      {:parse_ended, do_after} ->
+        do_after_go.(do_after)
         :ok
 
-      {ref, pid, monref, ets} ->
-        Process.demonitor(monref)
-        _ = :ets.delete(ets)
+      {ref, pid, monref, do_after} ->
+        _ = Process.demonitor(monref)
+        do_after_go.(do_after)
         flush_halt(pid, ref)
     end
   end
@@ -504,25 +558,50 @@ defmodule SweetXml do
     stream([IO.iodata_to_binary(doc)], options_callback)
   end
   def stream!(doc, options_callback) do
+    do_after_go = fn
+      :not_ours -> :ok
+      {:cleanup, ets} -> :ets.delete(ets)
+    end
     Stream.resource fn ->
       {parent, ref} = waiter = {self(), make_ref()}
       opts = options_callback.(fn e -> send(parent, {:event, ref, e}) end)
 
-      ets = :ets.new(nil, [:public])
       dtd_arg = :proplists.get_value(:dtd, opts, :all)
       opts = :proplists.delete(:dtd, opts)
-      opts = SweetXml.Options.handle_dtd(dtd_arg, SweetXml.DTDError).(ets) ++ opts
 
-      {pid, monref} = spawn_monitor fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
-      {ref, pid, monref, ets}
-    end, fn {ref, pid, monref, ets} = acc ->
+      {opts, do_after} = case :proplists.split(opts, [:rules]) do
+        {[[]], opts} ->
+          ets = :ets.new(nil, [:public])
+          opts = opts ++ SweetXml.Options.handle_dtd(dtd_arg, SweetXml.DTDError).(ets)
+          {opts, {:cleanup, ets}}
+
+        {[[{:rules, ets}] = rules], opts} ->
+          opts = rules ++ opts ++ SweetXml.Options.handle_dtd(dtd_arg, SweetXml.DTDError).(ets)
+          {opts, :not_ours}
+
+        {[[{:rules, _read_fun, _write_fun, _ets}]], opts} ->
+          ets = :ets.new(nil, [:public])
+          dtd_opts = SweetXml.Options.handle_dtd(dtd_arg, SweetXml.DTDError).(ets)
+          _ = case :proplists.split(dtd_opts, [:rules]) do
+            {[], _opts} -> :ok
+            {[_], _opts} ->
+              require Logger
+              _ = Logger.warn("rules opt will be overriden because of the dtd option")
+              :warned
+          end
+          {opts ++ dtd_opts, {:cleanup, ets}}
+      end
+
+      {pid, monref} = spawn_monitor(fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end)
+      {ref, pid, monref, do_after}
+    end, fn {ref, pid, monref, do_after} = acc ->
       receive do
         {:DOWN, ^monref, :process, ^pid, :normal} ->
-          {:halt, {:parse_ended, ets}}
+          {:halt, {:parse_ended, do_after}}
         {:DOWN, ^monref, :process, ^pid, {:fatal, error}} ->
-          {:halt, {:fatal, error, ets}}
+          {:halt, {:fatal, error, do_after}}
         {:DOWN, ^monref, :process, ^pid, error} ->
-          {:halt, {:error, error, ets}}
+          {:halt, {:error, error, do_after}}
         {:event, ^ref, event} ->
           {[event], acc}
         {:wait, ^ref} ->
@@ -530,21 +609,21 @@ defmodule SweetXml do
           {[], acc}
       end
     end, fn
-      {:parse_ended, ets} ->
-        _ = :ets.delete(ets)
+      {:parse_ended, do_after} ->
+        do_after_go.(do_after)
         :ok
 
-      {:fatal, error, ets} ->
-        _ = :ets.delete(ets)
+      {:fatal, error, do_after} ->
+        do_after_go.(do_after)
         raise SweetXml.XmerlFatal, error
 
-      {:error, {exception, stacktrace}, ets} ->
-        _ = :ets.delete(ets)
+      {:error, {exception, stacktrace}, do_after} ->
+        do_after_go.(do_after)
         reraise(exception, stacktrace)
 
-      {ref, pid, monref, ets} ->
-        Process.demonitor(monref)
-        _ = :ets.delete(ets)
+      {ref, pid, monref, do_after} ->
+        _ = Process.demonitor(monref)
+        do_after_go.(do_after)
         flush_halt(pid, ref)
     end
   end
