@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Changed
+
+* Handling the option `{:rules, _}` ourselve, as wall as partially the option `{:rules, _, _, _}`.
+  When nothing is given, a new table is created, and destroyed after.
+  If a table is given, and a DTD option is chosen, the table is reused for the DTD handling.
+  If a custom `{:rules, _, _, _}` is given, and a restrictive DTD option is chosen, the custome rule will be overriden.
+  Because of this mutual exclusivity (reconciling the behaviors is not possible via composition), it is recommended that you handle the DTD
+  problem by yourself. You can see the issue #71 for ideas.
+  See the issue #41 for more details on why this change happened. (Ets leaks.)
+
 ## [0.7.2] (2021-11-25)
 
 ### Changed
