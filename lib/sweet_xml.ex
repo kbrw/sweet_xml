@@ -508,17 +508,18 @@ defmodule SweetXml do
           opts = rules ++ opts ++ SweetXml.Options.handle_dtd(dtd_arg).(ets)
           {opts, :not_ours}
 
-        {[[{:rules, _read_fun, _write_fun, _ets}]], opts} ->
+        {[[{:rules, _read_fun, _write_fun, _ets}] = rules], opts} ->
           ets = :ets.new(nil, [:public])
           dtd_opts = SweetXml.Options.handle_dtd(dtd_arg).(ets)
-          _ = case :proplists.split(dtd_opts, [:rules]) do
-            {[], _opts} -> :ok
-            {[_], _opts} ->
+          # If we don't use the `:rules` option for the DTDs, then we can keep the original one
+          extra_opts = case :proplists.split(dtd_opts, [:rules]) do
+            {[], _opts} -> rules
+            {[[{:rules, _, _, _}] = extra], _opts} ->
               require Logger
               _ = Logger.warn("rules opt will be overriden because of the dtd option")
-              :warned
+              extra
           end
-          {opts ++ dtd_opts, {:cleanup, ets}}
+          {opts ++ dtd_opts ++ extra_opts, {:cleanup, ets}}
       end
 
       pid = spawn_link fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end

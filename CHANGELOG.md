@@ -4,7 +4,7 @@
 
 ### Changed
 
-* Handling the option `{:rules, _}` ourselve, as wall as partially the option `{:rules, _, _, _}`.
+* Handling the option `{:rules, _}` ourselve, as well as partially the option `{:rules, _, _, _}`.
   When nothing is given, a new table is created, and destroyed after.
   If a table is given, and a DTD option is chosen, the table is reused for the DTD handling.
   If a custom `{:rules, _, _, _}` is given, and a restrictive DTD option is chosen, the custome rule will be overriden.
