@@ -1,5 +1,5 @@
 defmodule SweetXmlTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   doctest SweetXml
 
   import SweetXml
