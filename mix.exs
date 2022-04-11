@@ -1,13 +1,15 @@
 defmodule SweetXml.Mixfile do
   use Mix.Project
 
-  def version, do: "0.7.2"
+  def version, do: "0.7.3"
 
-  @source_url "https://github.com/kbrw/sweet_xml"
+  def app, do: :sweet_xml
+
+  def source_url, do: "https://github.com/kbrw/#{app()}"
 
   def project do
     [
-      app: :sweet_xml,
+      app: app(),
       version: version(),
       elixir: "~> 1.0",
       description: "A sweet wrapper of :xmerl to help query XML docs",
@@ -36,7 +38,7 @@ defmodule SweetXml.Mixfile do
         "README.md": [title: "Overview"]
       ],
       main: "readme",
-      source_url: @source_url,
+      source_url: source_url(),
       # We need to git tag with the corresponding format.
       source_ref: "v#{version()}",
     ]
@@ -53,8 +55,8 @@ defmodule SweetXml.Mixfile do
       ],
       licenses: ["MIT"],
       links: %{
-        "Changelog" => "https://hexdocs.pm/sweet_xml/changelog.html",
-        "GitHub" => @source_url
+        "Changelog" => "https://hexdocs.pm/#{app()}/changelog.html",
+        "GitHub" => source_url(),
       }
     ]
   end

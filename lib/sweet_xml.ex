@@ -298,6 +298,8 @@ defmodule SweetXml do
   end
 
   @doc """
+  > #### Soft Deprecation {: .warning}
+  >
   > Will be later deprecated in favor of `stream_tags!/3`.
 
   Most common usage of streaming: stream a given tag or a list of tags, and
@@ -422,6 +424,8 @@ defmodule SweetXml do
   end
 
   @doc """
+  > #### Soft Deprecation {: .warning}
+  >
   > Will be later deprecated in favor of `stream!/2`.
 
   Create an element stream from a XML `doc`.
