@@ -760,26 +760,12 @@ defmodule SweetXml do
     %{sweet_xpath | transform_fun: fun}
   end
 
-  defp _value(entity) do
-    cond do
-      is_record? entity, :xmlText ->
-        xmlText(entity, :value)
-      is_record? entity, :xmlComment ->
-        xmlComment(entity, :value)
-      is_record? entity, :xmlPI ->
-        xmlPI(entity, :value)
-      is_record? entity, :xmlAttribute ->
-        xmlAttribute(entity, :value)
-      is_record? entity, :xmlObj ->
-        xmlObj(entity, :value)
-      true ->
-        entity
-    end
-  end
-
-  defp is_record?(data, kind) do
-    is_tuple(data) and tuple_size(data) > 0 and :erlang.element(1, data) == kind
-  end
+  defp _value(xmlText(value: value)), do:       value
+  defp _value(xmlComment(value: value)), do:    value
+  defp _value(xmlPI(value: value)), do:         value
+  defp _value(xmlAttribute(value: value)), do:  value
+  defp _value(xmlObj(value: value)), do:        value
+  defp _value(entity), do: entity
 
   defp continuation_opts(enum, waiter \\ nil) do
     [{
@@ -858,7 +844,7 @@ defmodule SweetXml do
 
   defp get_current_entities(parent, %SweetXpath{path: path, is_list: false, namespaces: namespaces}) do
     ret = :xmerl_xpath.string(path, parent, [namespace: namespaces])
-    if is_record?(ret, :xmlObj) do
+    if Record.is_record(ret, :xmlObj) do
       ret
     else
       List.first(ret)
