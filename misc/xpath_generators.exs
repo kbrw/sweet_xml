@@ -156,7 +156,7 @@ possibilities = for {xml, xpath} <- xpaths do
 
         [c1, c2, c3 | _] when is_integer(c1) and is_integer(c2) and is_integer(c3) -> "charlist"
       end
-      {inspect(res), type}
+      {res, type}
     catch
       :error, {:case_clause, data} -> IO.inspect({data, xml, x}, label: "case clause error")
       _kind, _payload ->
@@ -167,7 +167,7 @@ possibilities = for {xml, xpath} <- xpaths do
         #  to_case = #{cast_to}
         #  """)
         #Logger.error(Exception.format(kind, payload, __STACKTRACE__))
-        {"", "error"}
+        {:error, "error"}
     end
 
     modifiers = []
@@ -187,7 +187,7 @@ possibilities = for {xml, xpath} <- xpaths do
     %{
       xml: to_string(xml),
       xpath: to_string(xpath),
-      input: inspect(input),
+      input: input,
       modifiers: modifiers,
       type: type,
       res: res,
@@ -248,6 +248,35 @@ _ =
   |> IO.puts()
 
 Enum.each(possibilities, fn pos ->
+  import SweetXml
+  humanize_input = fn
+    [] = x -> inspect(x)
+    xmlObj(value: v) -> "xmlObj(#{inspect(v)})"
+    [xmlText(value: v)] -> "[xmlText(#{inspect(v)})]"
+    [xmlText(value: v1), xmlText(value: v2)] -> "[xmlText(#{inspect(v1)}), xmlText(#{inspect(v2)})]"
+    [xmlNsNode(prefix: p1, uri: v1)] -> "[xmlNsNode(#{inspect(p1)}=#{inspect(v1)})]"
+    [xmlNsNode(prefix: p1, uri: v1), xmlNsNode(prefix: p2, uri: v2)] -> "[xmlNsNode(#{inspect(p1)}=#{inspect(v1)}), xmlNsNode(#{inspect(p2)}=#{inspect(v2)})]"
+
+    f when is_float(f) -> inspect(f)
+    [f1] = xs when is_float(f1) -> inspect(xs)
+    [f1, f2] = xs when is_float(f1) and is_float(f2) -> inspect(xs)
+    i when is_integer(i) -> inspect(i)
+    [i1] = xs when is_integer(i1) -> inspect(xs)
+    [i1, i2] = xs when is_integer(i1) and is_integer(i2) -> inspect(xs)
+    nil = x -> inspect(x)
+    [nil] = xs -> inspect(xs)
+    [nil, nil] = xs -> inspect(xs)
+    b when is_binary(b) -> inspect(b)
+    [b1] = xs when is_binary(b1) -> inspect(xs)
+    [b1, b2] = xs when is_binary(b1) and is_binary(b2) -> inspect(xs)
+    [_, _, _ | _] = xs -> inspect(xs) # charlist
+    [[_, _, _ | _]] = xs -> inspect(xs) # [charlist]
+    [[_, _, _ | _], [_, _, _ | _]] = xs -> inspect(xs) # [charlist]
+    xmlNsNode(prefix: p1, uri: v1) -> "xmlNsNode(#{inspect(p1)}=#{inspect(v1)})"
+    xmlText(value: v) -> "xmlText(#{inspect(v)})"
+    [xmlObj(value: v)] -> "[xmlObj(#{inspect(v)})]"
+
+  end
   escape = fn
     "" -> ""
     x -> "`#{x}`"
@@ -257,11 +286,11 @@ Enum.each(possibilities, fn pos ->
   [
     pos.xml |> Enum.map_join("<br/>", (&String.trim/1) |> o.(escape)),
     pos.xpath |> Enum.map_join("<br/>", (&String.trim/1) |> o.(escape)),
-    pos.input |> Enum.map_join("<br/>", (&String.trim/1) |> o.(escape)),
+    pos.input |> Enum.map_join("<br/>", (humanize_input) |> o.(&String.trim/1) |> o.(escape)),
     pos.input_type,
     pos.modifiers |> Enum.map_join("<br/>", (&inspect/1) |> o.(escape)),
     pos.type,
-    pos.res |> Enum.map_join("<br/>", (&String.trim/1) |> o.(escape)),
+    pos.res |> Enum.filter(fn x -> x != :error end) |> Enum.map_join("<br/>", (humanize_input) |> o.(&String.trim/1) |> o.(escape)),
   ]
   |> Enum.join("|")
   |> wrap.()
