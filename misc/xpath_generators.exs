@@ -28,14 +28,14 @@ xpath_list_extractable = {xml, xpath}
 
 # singleton(xmlText) int
 xml = '''
-<gen><text>432</text></gen>
+<gen><text>4321</text></gen>
 '''
 xpath = ~C[/gen/text/text()]
 xpath_singleton_extractable_int = {xml, xpath}
 
 # list(xmlText) int
 xml = '''
-<gen><text>12</text><text>42</text></gen>
+<gen><text>1234</text><text>4256</text></gen>
 '''
 xpath = ~C[/gen/text/text()]
 xpath_list_extractable_int = {xml, xpath}
@@ -56,7 +56,7 @@ xpath_list_extractable_float = {xml, xpath}
 
 # list(xmlText) mixed number
 xml = '''
-<gen><text>42</text><text>1.1</text></gen>
+<gen><text>4290</text><text>1.1</text></gen>
 '''
 xpath = ~C[/gen/text/text()]
 xpath_list_extractable_mixed_number = {xml, xpath}
@@ -67,8 +67,8 @@ xml = '''
 '''
 xpath = ~C[/gen/processing-instruction('banana')]
 {doc, []} = :xmerl_scan.string(xml)
-ret = :xmerl_xpath.string(xpath, doc)
-IO.inspect(ret, label: "singleton(xmlPI)")
+_ret = :xmerl_xpath.string(xpath, doc)
+# IO.inspect(ret, label: "singleton(xmlPI)")
 
 # xmlNsNode (not extractable)
 xml = '''
@@ -84,8 +84,8 @@ xml = '''
 xpath = ~C[/gen/banana/namespace::split]
 xpath_list_not_extractable = {xml, xpath}
 
-import SweetXml
-xpath(~S[<gen><banana xmlns:split="dessert">split</banana></gen>], ~x[/gen/banana/namespace::split]) |> IO.inspect(label: "sweet_xml")
+# import SweetXml
+# xpath(~S[<gen><banana xmlns:split="dessert">split</banana></gen>], ~x[/gen/banana/namespace::split]) |> IO.inspect(label: "sweet_xml")
 
 is_list = [true, false]
 is_value = [true, false]
@@ -105,13 +105,33 @@ xpaths = [
   xpath_list_not_extractable,
 ]
 
-for {xml, xpath} <- xpaths do
+possibilities = for {xml, xpath} <- xpaths do
+  {doc, _rest} = :xmerl_scan.string(xml)
+  input = :xmerl_xpath.string(xpath, doc)
+  input_type = case input do
+    [] -> "empty"
+    {:xmlObj, _, _} -> "scalar"
+    [_] -> "singleton(element)"
+    [_, _] -> "list(element)"
+  end
+  #code = """
+  #xml = '''
+  ##{xml}
+  #'''
+  #xpath = ~C[#{xpath}]
+  #description = \"\"\"
+  #`#{inspect(res)}`
+  #\"\"\"
+  #"""
+  #_ = IO.puts(code <> "\n")
+
+
   doc = SweetXml.parse(xml)
   for is_list <- is_list, is_value <- is_value, is_optional <- is_optional, cast_to <- cast_to do
     x = %SweetXpath{path: xpath, is_list: is_list, is_value: is_value, is_optional: is_optional, cast_to: cast_to}
-    type = try do
-      SweetXml.xpath(doc, x)
-      |> case do
+    {res, type} = try do
+      res = SweetXml.xpath(doc, x)
+      type = case res do
         [] -> "empty(list)"
 
         i when is_integer(i) -> "int"
@@ -136,12 +156,114 @@ for {xml, xpath} <- xpaths do
 
         [c1, c2, c3 | _] when is_integer(c1) and is_integer(c2) and is_integer(c3) -> "charlist"
       end
+      {inspect(res), type}
     catch
       :error, {:case_clause, data} -> IO.inspect({data, xml, x}, label: "case clause error")
-      kind, payload ->
+      _kind, _payload ->
         #require Logger
+        #Logger.info("""
+        #  xml = #{xml}
+        #  xpath = #{xpath}
+        #  to_case = #{cast_to}
+        #  """)
         #Logger.error(Exception.format(kind, payload, __STACKTRACE__))
-        "error"
+        {"", "error"}
     end
+
+    modifiers = []
+    modifiers = modifiers ++ if not is_value do [?e] else [] end
+    modifiers = modifiers ++ if is_list do [?l] else [] end
+    modifiers = modifiers ++ if is_optional do [?o] else [] end
+    modifiers = modifiers ++ case cast_to do
+      :string -> [?s]
+      :soft_string -> [?S]
+      :integer -> [?i]
+      :soft_integer -> [?I]
+      :float -> [?f]
+      :soft_float -> [?F]
+      false -> []
+    end
+
+    %{
+      xml: to_string(xml),
+      xpath: to_string(xpath),
+      input: inspect(input),
+      modifiers: modifiers,
+      type: type,
+      res: res,
+      input_type: input_type,
+    }
+
   end
 end
+|> Enum.concat()
+|> Enum.group_by(fn x -> [x.input_type, x.modifiers, x.type] end)
+|> Enum.sort_by(fn {k, _} -> k end)
+|> Enum.flat_map(fn {_, xs} -> Enum.sort_by(xs, fn x -> x.modifiers end) end)
+|> Enum.chunk_by(fn x -> {x.input, x.type, x.res} end)
+|> Enum.map(fn xs ->
+  merge = fn x, acc ->
+    x = Map.update!(x, :modifiers, fn x -> [x] end)
+    Map.merge(acc, x, fn
+      :modifiers, ls, rs -> ls ++ rs
+      _, v, v -> v
+    end)
+  end
+    Enum.reduce(xs, %{}, merge)
+end)
+|> Enum.sort_by(fn x -> {x.input_type, x.type} end)
+|> Enum.chunk_by(fn x -> {x.input_type, x.type} end)
+|> Enum.map(fn xs ->
+  merge = fn x, acc ->
+    x = Map.update!(x, :xml, fn x -> [x] end)
+    x = Map.update!(x, :xpath, fn x -> [x] end)
+    x = Map.update!(x, :modifiers, fn x -> [x] end)
+    x = Map.update!(x, :input, fn x -> [x] end)
+    x = Map.update!(x, :res, fn x -> [x] end)
+    Map.merge(acc, x, fn
+      :xml, ls, rs -> ls ++ rs
+      :xpath, ls, rs -> ls ++ rs
+      :modifiers, ls, rs -> ls ++ rs
+      :input, ls, rs -> ls ++ rs
+      :res, ls, rs -> ls ++ rs
+      _, v, v -> v
+    end)
+  end
+    Enum.reduce(xs, %{}, merge)
+end)
+
+wrap = fn x -> "|#{x}|" end
+headers = ["xml", "xpath", "input", "input_type", "modifiers", "type", "res"]
+
+_ =
+  headers
+  |> Enum.join("|")
+  |> wrap.()
+  |> IO.puts()
+
+_ =
+  headers
+  |> Enum.map_join("|", fn _ -> "-" end)
+  |> wrap.()
+  |> IO.puts()
+
+Enum.each(possibilities, fn pos ->
+  escape = fn
+    "" -> ""
+    x -> "`#{x}`"
+  end
+  o = fn g, h -> fn x -> x |> g.() |> h.() end end
+
+  [
+    pos.xml |> Enum.map_join("<br/>", (&String.trim/1) |> o.(escape)),
+    pos.xpath |> Enum.map_join("<br/>", (&String.trim/1) |> o.(escape)),
+    pos.input |> Enum.map_join("<br/>", (&String.trim/1) |> o.(escape)),
+    pos.input_type,
+    pos.modifiers |> Enum.map_join("<br/>", (&inspect/1) |> o.(escape)),
+    pos.type,
+    pos.res |> Enum.map_join("<br/>", (&String.trim/1) |> o.(escape)),
+  ]
+  |> Enum.join("|")
+  |> wrap.()
+  |> IO.puts()
+end)
