@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+* Logger fixes for Elixir 1.15 (`#94`)
+* Now requires Elixir 1.11+ (`#94`)
+
 ## [0.7.3] (2022-04-11)
 
 ### Changed
