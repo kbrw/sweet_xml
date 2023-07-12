@@ -11,7 +11,7 @@ defmodule SweetXml.Mixfile do
     [
       app: app(),
       version: version(),
-      elixir: "~> 1.11",
+      elixir: "~> 1.12",
       description: "A sweet wrapper of :xmerl to help query XML docs",
       deps: deps(),
       docs: docs(),
