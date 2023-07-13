@@ -104,7 +104,7 @@ defmodule SweetXml.Options do
 
           {[[_]], _opts} ->
             require Logger
-            _ = Logger.warn("rules opt will be overriden because of the dtd option")
+            _ = Logger.warning("rules opt will be overriden because of the dtd option")
             opts = opts ++ dtd_opts ++ [rules: ets]
             {opts, {:cleanup, ets}}
         end
