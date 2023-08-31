@@ -1,11 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [0.7.4]
 
 ### Changed
 
-* Logger deprecation warning fixed for Elixir 1.15 (`#94`)
-* Now requires Elixir 1.12+ (`#94`)
+* Contribution from [@thbar](https://github.com/thbar):
+  * Logger deprecation warning fixed for Elixir 1.15 (`#94`)
+  * Now requires Elixir 1.12+ (`#94`)
 
 ## [0.7.3] (2022-04-11)
 
@@ -116,8 +117,9 @@
 
 Changelog format inspired by [keep-a-changelog](https://github.com/olivierlacan/keep-a-changelog)
 
-[unreleased]: https://github.com/kbrw/sweet_xml/compare/v0.7.3...HEAD
+[unreleased]: https://github.com/kbrw/sweet_xml/compare/v0.7.4...HEAD
 
+[0.7.4]: https://github.com/kbrw/sweet_xml/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/kbrw/sweet_xml/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/kbrw/sweet_xml/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/kbrw/sweet_xml/compare/v0.7.0...v0.7.1

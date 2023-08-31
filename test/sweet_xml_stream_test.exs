@@ -70,11 +70,10 @@ defmodule SweetXmlStreamTest do
     assert result == ['Nested Head', 'XML Parsing']
   end
 
-  describe "stream_tags!/2" do
-    test "streaming tags", %{simple_stream: simple_stream} do
+    test "streaming tags assertively", %{simple_stream: simple_stream} do
       result =
         simple_stream
-        |> stream_tags([:li, :special_match_key], discard: [:li, :special_match_key])
+        |> stream_tags!([:li, :special_match_key], discard: [:li, :special_match_key])
         |> Stream.map(fn {_, doc} -> xpath(doc, ~x"./text()") end)
         |> Enum.to_list
 
@@ -82,7 +81,7 @@ defmodule SweetXmlStreamTest do
 
       result =
         simple_stream
-        |> stream_tags(:head)
+        |> stream_tags!(:head)
         |> Stream.map(fn {_, doc} -> xpath(doc, ~x"./title/text()") end)
         |> Enum.to_list
 
@@ -115,5 +114,4 @@ defmodule SweetXmlStreamTest do
         |> Stream.run
       end
     end
-  end
 end
