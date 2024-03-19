@@ -7,7 +7,7 @@ defmodule Issue41Test do
     # Warning ! Sensitive to async tests.
     assert capture_log(fn ->
       SweetXml.parse("<tag></tag>", [rules, dtd: :none])
-    end) =~ "rules opt will be overriden because of the dtd option"
+    end) =~ "rules opt will be overridden because of the dtd option"
   end
 
   test "keeps our rules/1" do
