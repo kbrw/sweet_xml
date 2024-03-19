@@ -27,7 +27,8 @@ defmodule SweetXml.Mixfile do
 
   defp deps do
     [
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -40,7 +41,7 @@ defmodule SweetXml.Mixfile do
       main: "readme",
       source_url: source_url(),
       # We need to git tag with the corresponding format.
-      source_ref: "v#{version()}",
+      source_ref: "v#{version()}"
     ]
   end
 
@@ -56,7 +57,7 @@ defmodule SweetXml.Mixfile do
       licenses: ["MIT"],
       links: %{
         "Changelog" => "https://hexdocs.pm/#{app()}/changelog.html",
-        "GitHub" => source_url(),
+        "GitHub" => source_url()
       }
     ]
   end
