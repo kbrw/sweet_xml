@@ -760,6 +760,26 @@ defmodule SweetXml do
     %{sweet_xpath | transform_fun: fun}
   end
 
+  @doc ~S"""
+    Convert `doc` to XML string
+
+  ## Examples
+
+      iex> import SweetXml
+      iex> "<h1><a>Some linked title</a></h1>"
+      ...> |> parse()
+      ...> |> doc_to_xml()
+      "<?xml version=\"1.0\"?><h1><a>Some linked title</a></h1>"
+      iex> "<body><header><ul><li>One</li><li><a>Two</a></li></ul></header></body>"
+      ...> |> parse()
+      ...> |> xpath(~x"/body/header/ul"e)
+      ...> |> doc_to_xml()
+      "<?xml version=\"1.0\"?><ul><li>One</li><li><a>Two</a></li></ul>"
+  """
+  def doc_to_xml(doc) do
+    :xmerl.export([doc], :xmerl_xml) |> List.flatten() |> List.to_string()
+  end
+
   defp _value(entity) do
     cond do
       is_record? entity, :xmlText ->
