@@ -489,5 +489,5 @@ SweetXml source code is licensed under the [MIT License](https://github.com/kbrw
 # CONTRIBUTING
 
 Hi, and thank you for wanting to contribute.
-Please refer to the centralized informations available at: https://github.com/kbrw#contributing
+Please refer to the centralized information available at: https://github.com/kbrw#contributing
 

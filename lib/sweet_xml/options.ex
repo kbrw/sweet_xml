@@ -1,6 +1,6 @@
 defmodule SweetXml.Options do
   ### WARNING:
-  # This is an intenal api, use at your own risk.
+  # This is an internal api, use at your own risk.
 
   @moduledoc false
 
@@ -104,7 +104,7 @@ defmodule SweetXml.Options do
 
           {[[_]], _opts} ->
             require Logger
-            _ = Logger.warning("rules opt will be overriden because of the dtd option")
+            _ = Logger.warning("rules opt will be overridden because of the dtd option")
             opts = opts ++ dtd_opts ++ [rules: ets]
             {opts, {:cleanup, ets}}
         end
