@@ -714,7 +714,7 @@ defmodule SweetXml do
   ```
   For more details, see `parse/2`.
   """
-  @spec xmap(parent :: (doc | xmlElement), mapping :: specs, options :: (boolean | map)) :: (map | keyword | nil)
+  @spec xmap(parent :: (doc | xmlElement | nil), mapping :: specs, options :: (boolean | map)) :: (map | keyword | nil)
   when specs: keyword(spec | specs)
   def xmap(parent, mapping, options \\ false)
 
