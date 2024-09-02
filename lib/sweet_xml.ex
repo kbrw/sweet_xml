@@ -223,7 +223,7 @@ defmodule SweetXml do
 
     * `~x"//some/path"il` - integer list
   """
-  def sigil_x(path, modifiers \\ '') do
+  def sigil_x(path, modifiers \\ ~c"") do
     %SweetXpath{
       path: String.to_charlist(path),
       is_value: not(?e in modifiers),
@@ -293,7 +293,7 @@ defmodule SweetXml do
     parsed_doc
   end
   def do_parse(doc_enum, options) do
-    {parsed_doc, _} = :xmerl_scan.string('', options ++ continuation_opts(doc_enum))
+    {parsed_doc, _} = :xmerl_scan.string(~c"", options ++ continuation_opts(doc_enum))
     parsed_doc
   end
 
@@ -470,7 +470,7 @@ defmodule SweetXml do
 
       {opts, do_after} = SweetXml.Options.set_up(opts, RuntimeError)
 
-      pid = spawn_link fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end
+      pid = spawn_link fn -> :xmerl_scan.string(~c"", opts ++ continuation_opts(doc, waiter)) end
       {ref, pid, Process.monitor(pid), do_after}
     end, fn {ref, pid, monref, do_after} = acc ->
       receive do
@@ -513,7 +513,7 @@ defmodule SweetXml do
 
       {opts, do_after} = SweetXml.Options.set_up(opts, SweetXml.DTDError)
 
-      {pid, monref} = spawn_monitor(fn -> :xmerl_scan.string('', opts ++ continuation_opts(doc, waiter)) end)
+      {pid, monref} = spawn_monitor(fn -> :xmerl_scan.string(~c"", opts ++ continuation_opts(doc, waiter)) end)
       {ref, pid, monref, do_after}
     end, fn {ref, pid, monref, do_after} = acc ->
       receive do
