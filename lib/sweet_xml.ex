@@ -490,7 +490,7 @@ defmodule SweetXml do
       {ref, pid, monref, do_after} ->
         _ = Process.demonitor(monref)
         _ = SweetXml.Options.clean_up(do_after)
-        flush_halt(pid, ref)
+        flush_halt(pid, ref, monref)
     end
   end
 
@@ -545,7 +545,7 @@ defmodule SweetXml do
       {ref, pid, monref, do_after} ->
         _ = Process.demonitor(monref)
         _ = SweetXml.Options.clean_up(do_after)
-        flush_halt(pid, ref)
+        flush_halt(pid, ref, monref)
     end
   end
 
@@ -843,12 +843,20 @@ defmodule SweetXml do
     end
   end
 
-  defp flush_halt(pid, ref) do
+  defp flush_halt(pid, ref, monref) do
     receive do
       {:event, ^ref, _} ->
-        flush_halt(pid, ref) # flush all emitted elems after :halt
+        # flush all emitted elems after :halt
+        flush_halt(pid, ref, monref)
+
       {:wait, ^ref} ->
-        send(pid, {:halt, ref}) # tell the continuation function to halt the underlying stream
+        # tell the continuation function to halt the underlying stream
+        send(pid, {:halt, ref})
+        :done
+
+      {:DOWN, ^monref, :process, ^pid, :normal} ->
+        # flush down message from possibly dead process before demonitoring
+        :done
     end
   end
 
