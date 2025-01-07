@@ -1,6 +1,16 @@
 # Changelog
 
-## [0.7.4]
+## [0.7.5] (2025-01-07)
+A maintenance patch, with improvements made the the README, with up to date installation
+instructions from [@arcanemachine](https://github.com/arcanemachine) ([#95](https://github.com/kbrw/sweet_xml/pull/95))
+and typos fixed by [@kianmeng](https://github.com/kianmeng) ([#89](https://github.com/kbrw/sweet_xml/pull/89)).
+
+### Changed
+
+* Warning cleanups removal made by [@VictorTrin](https://github.com/VitorTrin) and [@elfenlaid](https://github.com/elfenlaid)
+([#96](https://github.com/kbrw/sweet_xml/pull/96) & [#102](https://github.com/kbrw/sweet_xml/pull/102))
+
+## [0.7.4] (2023-08-31)
 
 ### Changed
 
@@ -117,8 +127,9 @@
 
 Changelog format inspired by [keep-a-changelog](https://github.com/olivierlacan/keep-a-changelog)
 
-[unreleased]: https://github.com/kbrw/sweet_xml/compare/v0.7.4...HEAD
+[unreleased]: https://github.com/kbrw/sweet_xml/compare/v0.7.5...HEAD
 
+[0.7.5]: https://github.com/kbrw/sweet_xml/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/kbrw/sweet_xml/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/kbrw/sweet_xml/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/kbrw/sweet_xml/compare/v0.7.1...v0.7.2

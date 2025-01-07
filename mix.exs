@@ -1,7 +1,7 @@
 defmodule SweetXml.Mixfile do
   use Mix.Project
 
-  def version, do: "0.7.4"
+  def version, do: "0.7.5"
 
   def app, do: :sweet_xml
 
