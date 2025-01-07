@@ -21,7 +21,7 @@ defmodule SweetXml.Mixfile do
 
   def application do
     [
-      applications: [:logger, :xmerl]
+      extra_applications: [:logger, :xmerl]
     ]
   end
 
