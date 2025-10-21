@@ -242,7 +242,7 @@ defmodule SweetXml do
     }
   end
 
-  def add_namespace(xpath, prefix, uri) do
+  def add_namespace(%SweetXpath{} = xpath, prefix, uri) do
     %SweetXpath{xpath | namespaces: [{to_charlist(prefix), to_charlist(uri)}
                                      | xpath.namespaces]}
   end
