@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  mix-test:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - elixir: "1.12"
+            otp: "24"
+          - elixir: "1.16"
+            otp: "25"
+          - elixir: "1.17"
+            otp: "26"
+          - elixir: "1.18"
+            otp: "27"
+          - elixir: "1.19"
+            otp: "28"
+            lint: lint
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: deps-${{ runner.os }}-${{matrix.otp}}-${{matrix.elixir}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: deps-${{ runner.os }}-${{matrix.otp}}-${{matrix.elixir}}
+
+      - run: mix deps.get
+
+      - run: mix format --check-formatted
+        if: ${{ matrix.lint }}
+
+      - run: mix deps.unlock --check-unused
+        if: ${{ matrix.lint }}
+
+      - run: mix deps.compile
+
+      - run: mix compile --warnings-as-errors
+        if: ${{ matrix.lint }}
