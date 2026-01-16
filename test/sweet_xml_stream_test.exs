@@ -122,20 +122,32 @@ defmodule SweetXmlStreamTest do
   end
 
   test "DTD error" do
-    assert_raise SweetXml.DTDError, "DTD not allowed: lol1", fn ->
-      "test/files/billion_laugh.xml"
-      |> File.stream!()
-      |> SweetXml.stream_tags!(:banana, dtd: :none, quiet: true)
-      |> Stream.run()
-    end
+    Process.flag(:trap_exit, true)
+
+    pid =
+      spawn_link(fn ->
+        "test/files/billion_laugh.xml"
+        |> File.stream!()
+        |> SweetXml.stream_tags!(:banana, dtd: :none, quiet: true)
+        |> Stream.run()
+      end)
+
+    assert_receive {:EXIT, ^pid, reason}
+    assert match?({%SweetXml.XmerlFatal{reason: {:error, :entities_not_allowed}}, _}, reason)
   end
 
   test "internal only" do
-    assert_raise SweetXml.DTDError, "no external entity allowed", fn ->
-      "test/files/xxe.xml"
-      |> File.stream!()
-      |> SweetXml.stream_tags!(:result, dtd: :internal_only)
-      |> Stream.run()
-    end
+    Process.flag(:trap_exit, true)
+
+    pid =
+      spawn_link(fn ->
+        "test/files/xxe.xml"
+        |> File.stream!()
+        |> SweetXml.stream_tags!(:result, dtd: :internal_only)
+        |> Stream.run()
+      end)
+
+    assert_receive {:EXIT, ^pid, reason}
+    assert match?({%SweetXml.XmerlFatal{reason: {:error, :entities_not_allowed}}, _}, reason)
   end
 end
