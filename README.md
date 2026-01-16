@@ -1,6 +1,6 @@
 # SweetXml
 
-[![Build Status](https://api.travis-ci.org/kbrw/sweet_xml.svg)](http://travis-ci.org/kbrw/sweet_xml)
+[![Build Status](https://github.com/kbrw/sweet_xml/actions/workflows/.github/workflows/ci.yml/badge.svg)](https://github.com/kbrw/sweet_xml/actions/workflows/ci.yml)
 [![Module Version](https://img.shields.io/hexpm/v/sweet_xml.svg)](https://hex.pm/packages/sweet_xml)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/sweet_xml/)
 [![Total Download](https://img.shields.io/hexpm/dt/sweet_xml.svg)](https://hex.pm/packages/sweet_xml)
