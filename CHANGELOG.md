@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+* Fix the binary pattern match warning from 1.20 changes.
+
 ## [0.7.5] (2025-01-07)
 A maintenance patch, with improvements made the the README, with up to date installation
 instructions from [@arcanemachine](https://github.com/arcanemachine) ([#95](https://github.com/kbrw/sweet_xml/pull/95))

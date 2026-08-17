@@ -934,7 +934,7 @@ defmodule SweetXml do
 
   defp split_last_whitespace(size, bin) do
     case bin do
-      <<_::binary-size(size), h>> <> tail when h == ?\s or h == ?\n or h == ?\r or h == ?\t ->
+      <<_::binary-size(^size), h>> <> tail when h == ?\s or h == ?\n or h == ?\r or h == ?\t ->
         {head, _} = :erlang.split_binary(bin, size + 1)
         {head, tail}
 
